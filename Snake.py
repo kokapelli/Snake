@@ -8,7 +8,7 @@ class Snake:
         # (0, -1) Move Left
         # (0, 1) Move Right
         
-        self.head = Block((10, 10), (0,-1))
+        self.head = Block((13, 13), (0,-1), True)
         self.body = [self.head]
         self.length = 1
 
@@ -16,6 +16,12 @@ class Snake:
         for b in self.body:
             b.move()
 
+    def getHeadLoc(self):
+        return self.head.getLoc()
+
+    def getBody(self):
+        return self.body
+        
     def getBodyLoc(self):
         bodyLoc = list()
         for b in self.body:

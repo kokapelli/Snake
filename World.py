@@ -2,12 +2,15 @@ import numpy as np
 import Snake as Snake
 from os import system, name 
 
+CLEAR_SCREEN = True
+
 class World:
     def __init__(self):
-        self.wSize = 20
+        self.wSize = 25
         self.worldMat = self.createWorld()
         self.snake = Snake.Snake()
         self.gameTime = 0
+        self.alive = True
 
     def createWorld(self):
         world = list()
@@ -21,15 +24,18 @@ class World:
         return np.array(world)
 
     def updateWorld(self):
-        self.screenClear()
-        self.printWorld()   # Show the user the snake location  
-        self.resetWorld()   # Reset the world of prior snake locations
-        snakeLoc = self.snake.getBodyLoc()
-        for loc in snakeLoc:
-            self.worldMat[loc[0]][loc[1]] = 1
+        if(CLEAR_SCREEN):
+            self.screenClear()  # Clear screen for better "immersion"
+        self.resetWorld()       # Reset the world of prior snake locations
+        self.updateSnakePos()   # Move the snake by one time unit
+        if(not self.insideBoundary()):
+            print("You Lose")
+            self.alive = False
+            return
 
-        self.updateSnakePos()
-        self.updateTime()
+        self.setSnake()         # Display snake in the "world"
+        self.printWorld()       # Show the user the snake location  
+        self.updateGameTime()
 
     def updateSnakePos(self):
         self.snake.move()
@@ -39,6 +45,13 @@ class World:
 
     def printWorld(self):
         print(self.worldMat)
+
+    def setSnake(self):
+        body = self.snake.getBody()
+        for b in body:
+            x, y = b.getLoc()
+            print(x, y)
+            self.worldMat[x][y] = b.getRepr()
 
     def screenClear(self): 
     
@@ -50,6 +63,19 @@ class World:
         else: 
             _ = system('clear') 
 
-    def updateTime(self):
+    def updateGameTime(self):
         self.gameTime += 1
         print(self.gameTime)
+
+    def insideBoundary(self):
+        x, y = self.snake.getHeadLoc()
+        #print(x < 0, x >= self.wSize)
+        #print(y < 0, y >= self.wSize)
+        #print(f"(x:{x}, y:{y})")
+        if((x < 0 or x >= self.wSize) or (y < 0 or y >= self.wSize)):
+            return False
+        
+        return True
+
+    def isAlive(self):
+        return self.alive
