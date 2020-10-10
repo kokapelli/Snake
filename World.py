@@ -1,8 +1,9 @@
 import numpy as np
 import Snake as Snake
+import random
 from os import system, name 
 
-CLEAR_SCREEN = True
+CLEAR_SCREEN = False
 
 class World:
     def __init__(self):
@@ -11,6 +12,11 @@ class World:
         self.snake = Snake.Snake()
         self.gameTime = 0
         self.alive = True
+        self.food = [13, 8]
+
+        self.setSnake()
+        self.updateFood()
+        self.printWorld()
 
     def createWorld(self):
         world = list()
@@ -28,6 +34,7 @@ class World:
             self.screenClear()  # Clear screen for better "immersion"
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
+        self.updateFood()
         if(not self.insideBoundary()):
             print("You Lose")
             self.alive = False
@@ -53,16 +60,6 @@ class World:
             print(x, y)
             self.worldMat[x][y] = b.getRepr()
 
-    def screenClear(self): 
-    
-        # for windows 
-        if name == 'nt': 
-            _ = system('cls') 
-    
-        # for mac and linux(here, os.name is 'posix') 
-        else: 
-            _ = system('clear') 
-
     def updateGameTime(self):
         self.gameTime += 1
         print(self.gameTime)
@@ -79,3 +76,35 @@ class World:
 
     def isAlive(self):
         return self.alive
+
+    # Ensure food does not spawn on snake
+    def updateFood(self):
+
+        # If the snake passes a food point, it grows and a new food spawns
+        if(self.snake.getHeadLoc() == self.food or len(self.food) == 0):
+            free = list(zip(*np.where(self.worldMat == 0.))) # Get map location where snake is not
+            randInt = random.randint(0, len(free))
+            x, y = free[randInt]
+            print(f"food: {x, y}")
+            coords = [x, y]
+            self.snake.growSnake()
+
+        elif(len(self.food) > 0):
+            coords = self.food
+        
+        self.setFood(coords)
+
+    def setFood(self, coords):
+        self.food = coords
+        x, y = coords
+        self.worldMat[x][y] = 4 # Temporary food representation
+
+    def screenClear(self): 
+    
+        # for windows 
+        if name == 'nt': 
+            _ = system('cls') 
+    
+        # for mac and linux(here, os.name is 'posix') 
+        else: 
+            _ = system('clear') 
