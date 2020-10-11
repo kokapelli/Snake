@@ -24,6 +24,7 @@ class Snake:
 
         return string
     
+    
     def createInitSnake(self, bodyLen=2):
         
         for _ in range(bodyLen):
@@ -32,6 +33,31 @@ class Snake:
     def move(self):
         for b in self.body:
             b.move()
+        self.pushTrajectoryChange()
+
+
+    def growSnake(self):
+        end = self.body[-1]
+        endCoord, endTrajectory = self.getEndPiece(end)
+        # Negate trajectory to place the new piece at the back of the snake
+        bodyPartCoord = [x + y for x, y in zip(endCoord, np.negative(endTrajectory))]
+        bodyPart = Block(bodyPartCoord, endTrajectory, end)
+        self.body.append(bodyPart)
+        self.size += 1
+
+    def pushTrajectoryChange(self):
+        # As trajectory changes are done in reverse, the last element must be removed manually
+        if(self.body[-1].getTrajectoryChange()):
+            self.body[-1].setTrajectoryChange(False)
+
+        # Trajectory changes are applied reversed as to solve an otherwise cascading trajectory effect
+        for b in list(reversed(self.body)):
+            if(b.isHead):
+                continue
+            if(b.adjacentBody.getTrajectoryChange()):
+                b.adjacentBody.setTrajectoryChange(False)
+                b.setTrajectoryChange(True)
+
 
     def getHeadLoc(self):
         return self.head.getLoc()
@@ -41,7 +67,7 @@ class Snake:
 
     def setHeadTrajectory(self, newTrajectory):
         self.head.setTrajectory(newTrajectory)
-        self.head.setTrajectoryChange()
+        self.head.setTrajectoryChange(True)
 
     def getBody(self):
         return self.body
@@ -59,14 +85,6 @@ class Snake:
         
         return endCoord, endTrajectory
 
-    def growSnake(self):
-        end = self.body[-1]
-        endCoord, endTrajectory = self.getEndPiece(end)
-        # Negate trajectory to place the new piece at the back of the snake
-        bodyPartCoord = [x + y for x, y in zip(endCoord, np.negative(endTrajectory))]
-        bodyPart = Block(bodyPartCoord, endTrajectory, end)
-        self.body.append(bodyPart)
-        self.size += 1
 
     def describeSnake(self):
         for b in self.body:

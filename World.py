@@ -63,7 +63,6 @@ class World:
         body = self.snake.getBody()
         for b in body:
             x, y = b.getLoc()
-            #print(x, y)
             self.world[x][y] = 1
 
     def updateGameTime(self):

@@ -12,19 +12,10 @@ class Block:
 
     # Used to update the location of the snake piece by one time step
     def move(self):
-        if(self.adjacentBody is not None):
-            print("Adjacent",self.adjacentBody, self.trajectoryChange)
-            if(self.trajectoryChange):
-                self.trajectory = self.adjacentBody.getTrajectory()
-                self.trajectoryChange = False
-
-            self.location = [x + y for x, y in zip(self.location, self.trajectory)]
-
-            if(self.adjacentBody.getTrajectoryChange()):
-                self.setTrajectoryChange()
-        else:
-            self.location = [x + y for x, y in zip(self.location, self.trajectory)]
-
+        if(self.trajectoryChange and not self.isHead):
+            self.setTrajectory(self.adjacentBody.getTrajectory())
+        
+        self.location = [x + y for x, y in zip(self.location, self.trajectory)]
         
     def getLoc(self):
         return self.location
@@ -35,8 +26,11 @@ class Block:
     def getTrajectoryChange(self):
         return self.trajectoryChange
 
+    def getAdjacentBody(self):
+        return self.adjacentBody
+
     def setTrajectory(self, trajectory):
         self.trajectory = trajectory
 
-    def setTrajectoryChange(self):
-        self.trajectoryChange = True
+    def setTrajectoryChange(self, boolean):
+        self.trajectoryChange = boolean

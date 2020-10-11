@@ -2,7 +2,7 @@ from tkinter import *
 from World import World
 import time
 
-GAME_SPEED = 0.5
+GAME_SPEED = 300
 
 class GUI:
     def __init__(self, size):
@@ -47,7 +47,7 @@ class GUI:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="black")
 
         if(self.world.isAlive()):
-            self.board.after(500, self.draw)
+            self.board.after(GAME_SPEED, self.draw)
         else:
             return
 
