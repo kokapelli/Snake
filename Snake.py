@@ -9,10 +9,20 @@ class Snake:
         # (0, -1) Move Left
         # (0, 1) Move Right
 
-        self.head = Block([13, 13], [0, -1], True)
+        self.head = Block([13, 13], [0, -1], None, True)
         self.body = [self.head]
+        self.size = 1
         self.createInitSnake()
-        self.length = 1
+
+    def __repr__(self):
+        string = ""
+        for i in self.body:
+            if(not i.isHead):
+                string += f"<-{i}"
+            else:
+                string += str(i)
+
+        return string
     
     def createInitSnake(self, bodyLen=2):
         
@@ -25,6 +35,13 @@ class Snake:
 
     def getHeadLoc(self):
         return self.head.getLoc()
+
+    def getHeadTrajectory(self):
+        return self.head.getTrajectory()
+
+    def setHeadTrajectory(self, newTrajectory):
+        self.head.setTrajectory(newTrajectory)
+        self.head.setTrajectoryChange()
 
     def getBody(self):
         return self.body
@@ -47,5 +64,10 @@ class Snake:
         endCoord, endTrajectory = self.getEndPiece(end)
         # Negate trajectory to place the new piece at the back of the snake
         bodyPartCoord = [x + y for x, y in zip(endCoord, np.negative(endTrajectory))]
-        bodyPart = Block(bodyPartCoord, endTrajectory)
+        bodyPart = Block(bodyPartCoord, endTrajectory, end)
         self.body.append(bodyPart)
+        self.size += 1
+
+    def describeSnake(self):
+        for b in self.body:
+            print(f"Coord: {b.getLoc()}  Trajectory: {b.getTrajectory()}")

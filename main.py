@@ -1,10 +1,13 @@
-from World import World
-from Snake import Snake
-import time
-GAME_SPEED = 0.5
+from GUI import GUI
+
+GAME_SIZE  = 540
+
+def startGame():
+    game = GUI(GAME_SIZE)
+    game.draw()
+    game.master.mainloop()
+    #game.master.update_idletasks()
+    #game.master.update()
 
 if __name__ == "__main__":
-    world = World()
-    while(world.isAlive()):
-        time.sleep(GAME_SPEED)
-        world.updateWorld()
+    startGame()
