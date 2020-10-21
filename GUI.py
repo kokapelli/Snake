@@ -17,6 +17,7 @@ class GUI:
         self.board.bind('<Right>', self.rightKey)
         self.board.bind('<Up>', self.upKey)
         self.board.bind('<Down>', self.downKey)
+        self.board.bind('<Escape>', self.exit)
         self.board.focus_set()
         self.board.pack()
 
@@ -56,16 +57,32 @@ class GUI:
 
     def leftKey(self, _):
         print("Left Key Pressed")
-        self.world.snake.setHeadTrajectory([0, -1])
+        if(self.world.snake.getHeadTrajectory() == [0, 1]):
+            return
+        #self.world.snake.setHeadTrajectory([0, -1])
+        self.world.setTrajectoryInput([0, -1])
 
     def rightKey(self, _):
         print("Right Key Pressed")
-        self.world.snake.setHeadTrajectory([0, 1])
+        if(self.world.snake.getHeadTrajectory() == [0, -1]):
+            return
+        #self.world.snake.setHeadTrajectory([0, 1])
+        self.world.setTrajectoryInput([0, 1])
+
 
     def upKey(self, _):
         print("Up Key Pressed")
-        self.world.snake.setHeadTrajectory([-1, 0])
+        if(self.world.snake.getHeadTrajectory() == [1, 0]):
+            return
+        #self.world.snake.setHeadTrajectory([-1, 0])
+        self.world.setTrajectoryInput([-1, 0])
 
     def downKey(self, _):
         print("Down Key Pressed")
-        self.world.snake.setHeadTrajectory([1, 0])
+        if(self.world.snake.getHeadTrajectory() == [-1, 0]):
+            return
+        #self.world.snake.setHeadTrajectory([1, 0])
+        self.world.setTrajectoryInput([1, 0])
+
+    def exit(self, event):
+        sys.exit()

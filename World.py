@@ -14,6 +14,8 @@ class World:
         self.gameTime = 0
         self.alive = True
         self.food = []
+        # Start game by moving upwards, consider randomizing this value
+        self.trajectoryInput = [0, -1]
 
     def createWorld(self):
         world = list()
@@ -38,13 +40,16 @@ class World:
             self.alive = False
             return
 
-        self.setSnake()         # Display snake in the "world"
-        self.printWorld()       # Show the user the snake location  
+        self.printSnake()       # Display snake in the console "world"
+        self.printWorld()       # Show the user the console snake location  
         self.updateGameTime()
         print(self.snake)
         #self.snake.describeSnake()
 
     def updateSnakePos(self):
+        if(self.snake.getHeadTrajectory() != self.trajectoryInput):
+            print(str(self.snake.getHeadTrajectory()) + " - " + str(self.trajectoryInput))
+            self.snake.setHeadTrajectory(self.trajectoryInput)
         self.snake.move()
 
     def resetWorld(self):
@@ -52,6 +57,7 @@ class World:
 
     def printWorld(self):
         print(self.world)
+        print("\n")
 
     def getWorld(self):
         return self.world
@@ -59,11 +65,14 @@ class World:
     def getSnake(self):
         return self.snake
 
-    def setSnake(self):
+    def printSnake(self):
         body = self.snake.getBody()
         for b in body:
             x, y = b.getLoc()
             self.world[x][y] = 1
+
+    def setTrajectoryInput(self, newTrajectory):
+        self.trajectoryInput = newTrajectory
 
     def updateGameTime(self):
         self.gameTime += 1

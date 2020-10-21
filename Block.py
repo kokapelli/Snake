@@ -5,15 +5,16 @@ class Block:
         self.trajectory = trajectory
         self.adjacentBody = adjacent
         self.trajectoryChange = False
+        self.nextTrajectory = 0
 
     def __repr__(self):
-        string = f"({self.location}{self.trajectory})"
+        string = f"({self.location}{self.trajectory}{self.trajectoryChange})"
         return string
 
     # Used to update the location of the snake piece by one time step
     def move(self):
         if(self.trajectoryChange and not self.isHead):
-            self.setTrajectory(self.adjacentBody.getTrajectory())
+            self.setTrajectory(self.nextTrajectory)
         
         self.location = [x + y for x, y in zip(self.location, self.trajectory)]
         
@@ -34,3 +35,6 @@ class Block:
 
     def setTrajectoryChange(self, boolean):
         self.trajectoryChange = boolean
+
+    def setNextTrajectory(self, trajectory):
+        self.nextTrajectory = trajectory

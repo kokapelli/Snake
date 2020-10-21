@@ -26,7 +26,6 @@ class Snake:
     
     
     def createInitSnake(self, bodyLen=2):
-        
         for _ in range(bodyLen):
             self.growSnake()
 
@@ -57,6 +56,7 @@ class Snake:
             if(b.adjacentBody.getTrajectoryChange()):
                 b.adjacentBody.setTrajectoryChange(False)
                 b.setTrajectoryChange(True)
+                b.setNextTrajectory(b.adjacentBody.getTrajectory())
 
 
     def getHeadLoc(self):
