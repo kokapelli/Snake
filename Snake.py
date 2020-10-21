@@ -85,7 +85,18 @@ class Snake:
         
         return endCoord, endTrajectory
 
-
     def describeSnake(self):
         for b in self.body:
             print(f"Coord: {b.getLoc()}  Trajectory: {b.getTrajectory()}")
+
+    def getBodyPartLocs(self):
+        locs = list()
+        # Convert locations to tuples to more easily find collisions
+        for b in self.body:
+            locs.append((b.getLoc()[0], b.getLoc()[1]))
+        return locs
+
+    def checkCollision(self):
+        locs = self.getBodyPartLocs()
+        print(locs, len(locs))
+        return len(locs) != len(set(locs))

@@ -2,7 +2,7 @@ from tkinter import *
 from World import World
 import time
 
-GAME_SPEED = 300
+GAME_SPEED = 200
 
 class GUI:
     def __init__(self, size):

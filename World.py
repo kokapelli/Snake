@@ -35,14 +35,13 @@ class World:
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
         self.updateFood()
-        if(not self.insideBoundary()):
-            print("You Lose")
-            self.alive = False
-            return
-
         self.printSnake()       # Display snake in the console "world"
         self.printWorld()       # Show the user the console snake location  
         self.updateGameTime()
+        if(not self.insideBoundary() or self.selfCollide()):
+            print("You Lose")
+            self.alive = False
+            return
         print(self.snake)
         #self.snake.describeSnake()
 
@@ -87,6 +86,9 @@ class World:
             return False
         
         return True
+
+    def selfCollide(self):
+        return self.snake.checkCollision()
 
     def isAlive(self):
         return self.alive
