@@ -1,15 +1,19 @@
 from Block import Block
 import numpy as np
+from random import randint
+
 
 class Snake:
-    def __init__(self):
-        # Spawn the head at x:13, y:13. Have it move up, one block at a time
+    def __init__(self, world):
         # (-1, 0) Move Up 
         # (1, 0) Move Down
         # (0, -1) Move Left
         # (0, 1) Move Right
 
-        self.head = Block([13, 13], [0, -1], None, True)
+        #Primarily used to get the world 
+        # size and to establish a random spawn point
+        self.world = world
+        self.head = Block(self.headStartPos(), [0, -1], None, True)
         self.body = [self.head]
         self.size = 1
         self.createInitSnake()
@@ -25,7 +29,7 @@ class Snake:
         return string
     
     
-    def createInitSnake(self, bodyLen=2):
+    def createInitSnake(self, bodyLen=1):
         for _ in range(bodyLen):
             self.growSnake()
 
@@ -57,6 +61,9 @@ class Snake:
                 b.adjacentBody.trajectoryChange = False
                 b.trajectoryChange = True
                 b.nextTrajectory = b.adjacentBody.trajectory
+
+    def getSnakeSize(self):
+        return self.size
 
     def getHeadLoc(self):
         return self.head.location
@@ -100,3 +107,10 @@ class Snake:
         locs = self.getBodyPartLocs()
         #print(locs, len(locs))
         return len(locs) != len(set(locs))
+
+    def headStartPos(self):
+        x = randint(2, self.world.worldSize - 3)
+        y = randint(2, self.world.worldSize - 3)
+        print(x, y)
+
+        return [x, y]

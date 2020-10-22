@@ -8,7 +8,7 @@ DEBUG = False
 class GUI:
     def __init__(self, size):
         self.size = size
-        self.squareNr = 30
+        self.squareNr = 20
         self.world = World(self.squareNr, DEBUG)
         self.squareDim = self.size // self.squareNr
 
@@ -32,7 +32,7 @@ class GUI:
     def draw(self):
         self.resetBoard()
         self.world.updateWorld()
-        currWorldState = self.world.getWorld()
+        currWorldState = self.world.world
 
         for row in range(self.squareNr):
             for col in range(self.squareNr):
@@ -42,13 +42,13 @@ class GUI:
                 y2 = self.squareDim*(row+1)
 
                 if(currWorldState[row][col] == 1):
-                    self.board.create_rectangle(x1, y1, x2, y2, fill="white")
+                    self.board.create_rectangle(x1, y1, x2, y2, fill="AntiqueWhite1")
                 elif(currWorldState[row][col] == 2):
-                    self.board.create_rectangle(x1, y1, x2, y2, fill="green")
+                    self.board.create_rectangle(x1, y1, x2, y2, fill="pale green")
                 else:
-                    self.board.create_rectangle(x1, y1, x2, y2, fill="black")
+                    self.board.create_rectangle(x1, y1, x2, y2, fill="gray15")
 
-        if(self.world.isAlive()):
+        if(self.world.alive):
             self.board.after(GAME_SPEED, self.draw)
         else:
             return
@@ -60,7 +60,7 @@ class GUI:
                     #####################
                     ## Keyboard inputs ##
                     #####################
-                    
+
     def leftKey(self, _):
         print("Left Key Pressed")
         if(self.world.snake.getHeadTrajectory() == [0, 1]):
