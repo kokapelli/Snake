@@ -3,12 +3,13 @@ from World import World
 import time
 
 GAME_SPEED = 200
+DEBUG = False
 
 class GUI:
     def __init__(self, size):
         self.size = size
         self.squareNr = 30
-        self.world = World(self.squareNr)
+        self.world = World(self.squareNr, DEBUG)
         self.squareDim = self.size // self.squareNr
 
         self.createBoard()
@@ -55,6 +56,11 @@ class GUI:
     def resetBoard(self):
         self.board.delete("all")
 
+
+                    #####################
+                    ## Keyboard inputs ##
+                    #####################
+                    
     def leftKey(self, _):
         print("Left Key Pressed")
         if(self.world.snake.getHeadTrajectory() == [0, 1]):

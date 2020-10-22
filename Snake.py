@@ -46,57 +46,57 @@ class Snake:
 
     def pushTrajectoryChange(self):
         # As trajectory changes are done in reverse, the last element must be removed manually
-        if(self.body[-1].getTrajectoryChange()):
-            self.body[-1].setTrajectoryChange(False)
+        if(self.body[-1].trajectoryChange):
+            self.body[-1].trajectoryChange = False
 
         # Trajectory changes are applied reversed as to solve an otherwise cascading trajectory effect
         for b in list(reversed(self.body)):
             if(b.isHead):
                 continue
-            if(b.adjacentBody.getTrajectoryChange()):
-                b.adjacentBody.setTrajectoryChange(False)
-                b.setTrajectoryChange(True)
-                b.setNextTrajectory(b.adjacentBody.getTrajectory())
-
+            if(b.adjacentBody.trajectoryChange):
+                b.adjacentBody.trajectoryChange = False
+                b.trajectoryChange = True
+                b.nextTrajectory = b.adjacentBody.trajectory
 
     def getHeadLoc(self):
-        return self.head.getLoc()
+        return self.head.location
 
     def getHeadTrajectory(self):
-        return self.head.getTrajectory()
-
-    def setHeadTrajectory(self, newTrajectory):
-        self.head.setTrajectory(newTrajectory)
-        self.head.setTrajectoryChange(True)
-
+        return self.head.trajectory
+        
     def getBody(self):
         return self.body
+
+    def setHeadTrajectory(self, newTrajectory):
+        self.head.trajectory = newTrajectory
+        self.head.trajectoryChange = True
+
 
     def getBodyLoc(self):
         bodyLoc = list()
         for b in self.body:
-            bodyLoc.append(b.getLoc())
+            bodyLoc.append(b.location)
 
         return bodyLoc
 
     def getEndPiece(self, end):
-        endCoord = end.getLoc()
-        endTrajectory = np.array(end.getTrajectory()) # type change to negate array cleaner
+        endCoord = end.location
+        endTrajectory = np.array(end.trajectory) # type change to negate array cleaner
         
         return endCoord, endTrajectory
 
     def describeSnake(self):
         for b in self.body:
-            print(f"Coord: {b.getLoc()}  Trajectory: {b.getTrajectory()}")
+            print(f"Coord: {b.location}  Trajectory: {b.trajectory}")
 
     def getBodyPartLocs(self):
         locs = list()
         # Convert locations to tuples to more easily find collisions
         for b in self.body:
-            locs.append((b.getLoc()[0], b.getLoc()[1]))
+            locs.append((b.location[0], b.location[1]))
         return locs
 
     def checkCollision(self):
         locs = self.getBodyPartLocs()
-        print(locs, len(locs))
+        #print(locs, len(locs))
         return len(locs) != len(set(locs))

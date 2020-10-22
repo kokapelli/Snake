@@ -14,27 +14,46 @@ class Block:
     # Used to update the location of the snake piece by one time step
     def move(self):
         if(self.trajectoryChange and not self.isHead):
-            self.setTrajectory(self.nextTrajectory)
+            self.trajectory = self.nextTrajectory
         
         self.location = [x + y for x, y in zip(self.location, self.trajectory)]
         
-    def getLoc(self):
-        return self.location
+    @property
+    def location(self):
+        return self._location
 
-    def getTrajectory(self):
-        return self.trajectory 
+    @property
+    def trajectory(self):
+        return self._trajectory
 
-    def getTrajectoryChange(self):
-        return self.trajectoryChange
+    @property
+    def trajectoryChange(self):
+        return self._trajectoryChange
 
-    def getAdjacentBody(self):
-        return self.adjacentBody
+    @property
+    def adjacentBody(self):
+        return self._adjacentBody
 
-    def setTrajectory(self, trajectory):
-        self.trajectory = trajectory
+    @property
+    def nextTrajectory(self):
+        return self._nextTrajectory
 
-    def setTrajectoryChange(self, boolean):
-        self.trajectoryChange = boolean
+    @location.setter
+    def location(self, loc):
+        self._location = loc
 
-    def setNextTrajectory(self, trajectory):
-        self.nextTrajectory = trajectory
+    @trajectory.setter
+    def trajectory(self, trajectory):
+        self._trajectory = trajectory
+
+    @trajectoryChange.setter
+    def trajectoryChange(self, trajectoryChange):
+        self._trajectoryChange = trajectoryChange
+
+    @adjacentBody.setter
+    def adjacentBody(self, body):
+        self._adjacentBody = body
+
+    @nextTrajectory.setter
+    def nextTrajectory(self, trajectory):
+        self._nextTrajectory = trajectory

@@ -4,10 +4,11 @@ import random
 
 from os import system, name 
 
-CLEAR_SCREEN = False
+debug = False
 
 class World:
-    def __init__(self, size):
+    def __init__(self, size, debug):
+        self.debugMode = debug
         self.size = size
         self.world = self.createWorld()
         self.snake = Snake.Snake()
@@ -29,25 +30,28 @@ class World:
         return np.array(world)
 
     def updateWorld(self):
-        if(CLEAR_SCREEN):
-            self.screenClear()  # Clear screen for better "immersion"
 
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
         self.updateFood()
-        self.printSnake()       # Display snake in the console "world"
-        self.printWorld()       # Show the user the console snake location  
         self.updateGameTime()
+        self.setSnake()         # Set the sname value in the console "world"
+
         if(not self.insideBoundary() or self.selfCollide()):
             print("You Lose")
             self.alive = False
             return
-        print(self.snake)
+
+
+        if(debug):
+            self.screenClear()  # Clear screen for better "immersion"
+            self.printWorld()       # Show the user the console snake location  
+            print(self.snake)
         #self.snake.describeSnake()
 
     def updateSnakePos(self):
         if(self.snake.getHeadTrajectory() != self.trajectoryInput):
-            print(str(self.snake.getHeadTrajectory()) + " - " + str(self.trajectoryInput))
+            #print(str(self.snake.getHeadTrajectory()) + " - " + str(self.trajectoryInput))
             self.snake.setHeadTrajectory(self.trajectoryInput)
         self.snake.move()
 
@@ -64,10 +68,10 @@ class World:
     def getSnake(self):
         return self.snake
 
-    def printSnake(self):
+    def setSnake(self):
         body = self.snake.getBody()
         for b in body:
-            x, y = b.getLoc()
+            x, y = b.location
             self.world[x][y] = 1
 
     def setTrajectoryInput(self, newTrajectory):
@@ -79,9 +83,9 @@ class World:
 
     def insideBoundary(self):
         x, y = self.snake.getHeadLoc()
-        print(x < 0, x >= self.size)
-        print(y < 0, y >= self.size)
-        print(f"(x:{x}, y:{y})")
+        #print(x < 0, x >= self.size)
+        #print(y < 0, y >= self.size)
+        #print(f"(x:{x}, y:{y})")
         if((x < 0 or x >= self.size) or (y < 0 or y >= self.size)):
             return False
         
