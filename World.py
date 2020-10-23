@@ -34,18 +34,17 @@ class World:
 
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
-        self.updateFood()
-        self.updateGameState()
-
         if(not self.insideBoundary() or self.selfCollide()):
             print("You Lose")
             self.alive = False
             return
 
-        
-        self.setSnake()         # Set the sname value in the console "world"
+        self.setSnake()         # Set the snake value in the console "world"
+        self.updateFood()
+        self.updateGameState()
 
-        if(debug):
+
+        if(self.debugMode):
             self.screenClear()  # Clear screen for better "immersion"
             self.printWorld()   # Show the user the console snake location  
             print(self.snake)
@@ -96,14 +95,14 @@ class World:
     def updateFood(self):
         # If the snake passes a food point, it grows and a new food spawns
         if(self.snake.getHeadLoc() == self.food or len(self.food) == 0):
-            free = list(zip(*np.where(self.world == 0.))) # Get map location where snake is not
-            randInt = random.randint(0, len(free))
-            x, y = free[randInt]
-            #print(f"food: {x, y}")
+            freeLocs = list(zip(*np.where(self.world == 0))) # Get map location where snake is not
+            randInt = random.randint(0, len(freeLocs))
+            x, y = freeLocs[randInt]
+            
             coords = [x, y]
             self.snake.growSnake()
 
-        elif(len(self.food) > 0):
+        elif(len(self.food)):
             coords = self.food
         
         self.setFood(coords)

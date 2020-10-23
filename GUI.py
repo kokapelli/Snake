@@ -51,6 +51,9 @@ class GUI:
         if(self.world.alive):
             self.board.after(GAME_SPEED, self.draw)
         else:
+            l = Label(self.master, bg="salmon", text="You Lost!", font=("Helvetica", 30)) 
+            l.place(relx = 0.5, rely = 0.5, anchor = 'center')
+            l.config(width=self.size)
             return
 
     def resetBoard(self):

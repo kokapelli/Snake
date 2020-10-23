@@ -1,6 +1,5 @@
 from Block import Block
 import numpy as np
-from random import randint
 
 
 class Snake:
@@ -13,7 +12,7 @@ class Snake:
         #Primarily used to get the world 
         # size and to establish a random spawn point
         self.world = world
-        self.head = Block(self.headStartPos(), [0, -1], None, True)
+        self.head = Block([10, 10], [0, -1], None, True)
         self.body = [self.head]
         self.size = 1
         self.createInitSnake()
@@ -107,10 +106,3 @@ class Snake:
         locs = self.getBodyPartLocs()
         #print(locs, len(locs))
         return len(locs) != len(set(locs))
-
-    def headStartPos(self):
-        x = randint(2, self.world.worldSize - 3)
-        y = randint(2, self.world.worldSize - 3)
-        print(x, y)
-
-        return [x, y]
