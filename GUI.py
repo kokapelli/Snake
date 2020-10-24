@@ -1,9 +1,10 @@
 from tkinter import *
+from Movement import Trajectory
 from World import World
 import time
 
-GAME_SPEED = 200
-DEBUG = False
+GAME_SPEED = 50
+DEBUG = True
 
 class GUI:
     def __init__(self, size):
@@ -32,7 +33,7 @@ class GUI:
     def draw(self):
         self.resetBoard()
         self.world.updateWorld()
-        currWorldState = self.world.world
+        currWorldState = self.world.state
 
         for row in range(self.squareNr):
             for col in range(self.squareNr):
@@ -66,32 +67,32 @@ class GUI:
 
     def leftKey(self, _):
         print("Left Key Pressed")
-        if(self.world.snake.getHeadTrajectory() == [0, 1]):
+        if(self.world.snake.head.trajectory == Trajectory.RIGHT):
             return
-        #self.world.snake.setHeadTrajectory([0, -1])
-        self.world.setTrajectoryInput([0, -1])
+        #self.world.snake.setHeadTrajectory(Trajectory.LEFT)
+        self.world.setTrajectoryInput(Trajectory.LEFT)
 
     def rightKey(self, _):
         print("Right Key Pressed")
-        if(self.world.snake.getHeadTrajectory() == [0, -1]):
+        if(self.world.snake.head.trajectory == Trajectory.LEFT):
             return
-        #self.world.snake.setHeadTrajectory([0, 1])
-        self.world.setTrajectoryInput([0, 1])
+        #self.world.snake.setHeadTrajectory(Trajectory.RIGHT)
+        self.world.setTrajectoryInput(Trajectory.RIGHT)
 
 
     def upKey(self, _):
         print("Up Key Pressed")
-        if(self.world.snake.getHeadTrajectory() == [1, 0]):
+        if(self.world.snake.head.trajectory == Trajectory.DOWN):
             return
-        #self.world.snake.setHeadTrajectory([-1, 0])
-        self.world.setTrajectoryInput([-1, 0])
+        #self.world.snake.setHeadTrajectory(Trajectory.UP)
+        self.world.setTrajectoryInput(Trajectory.UP)
 
     def downKey(self, _):
         print("Down Key Pressed")
-        if(self.world.snake.getHeadTrajectory() == [-1, 0]):
+        if(self.world.snake.head.trajectory == Trajectory.UP):
             return
-        #self.world.snake.setHeadTrajectory([1, 0])
-        self.world.setTrajectoryInput([1, 0])
+        #self.world.snake.setHeadTrajectory(Trajectory.DOWN)
+        self.world.setTrajectoryInput(Trajectory.DOWN)
 
     def exit(self, event):
         sys.exit()
