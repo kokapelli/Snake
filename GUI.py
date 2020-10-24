@@ -4,7 +4,7 @@ from World import World
 import time
 
 GAME_SPEED = 50
-DEBUG = True
+DEBUG = False
 
 class GUI:
     def __init__(self, size):
@@ -65,6 +65,7 @@ class GUI:
                     ## Keyboard inputs ##
                     #####################
 
+
     def leftKey(self, _):
         print("Left Key Pressed")
         if(self.world.snake.head.trajectory == Trajectory.RIGHT):
@@ -78,7 +79,6 @@ class GUI:
             return
         #self.world.snake.setHeadTrajectory(Trajectory.RIGHT)
         self.world.setTrajectoryInput(Trajectory.RIGHT)
-
 
     def upKey(self, _):
         print("Up Key Pressed")

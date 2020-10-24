@@ -26,7 +26,6 @@ class Snake:
     def move(self):
         for b in self.body:
             b.move()
-        self.pushTrajectoryChange()
     
     def createInitSnake(self, bodyLen=1):
         #print(self.head)
@@ -43,21 +42,6 @@ class Snake:
         self.body.append(bodyPart)
         self.size += 1
 
-    def pushTrajectoryChange(self):
-        # As trajectory changes are done in reverse, the last element must be removed manually
-        if(self.body[-1].trajectoryChange):
-            self.body[-1].trajectoryChange = False
-
-        # Trajectory changes are applied reversed as to solve an otherwise cascading trajectory effect
-        for b in list(reversed(self.body)):
-            if(b.isHead):
-                continue
-            if(b.adjacentBody.trajectoryChange):
-                b.adjacentBody.trajectoryChange = False
-                b.trajectoryChange = True
-                b.nextTrajectory = b.adjacentBody.trajectory
-
-
     def setHeadTrajectory(self, newTrajectory):
         self.head.trajectory = newTrajectory
         self.head.trajectoryChange = True
@@ -68,10 +52,6 @@ class Snake:
             bodyLoc.append(b.location)
 
         return bodyLoc
-
-    def describeSnake(self):
-        for b in self.body:
-            print(f"Coord: {b.location}  Trajectory: {b.trajectory}")
 
     def getBodyPartLocs(self):
         locs = list()
