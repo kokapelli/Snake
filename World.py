@@ -6,7 +6,7 @@ from random import randint
 from os import system, name 
 
 class World:
-    def __init__(self, worldSize, debug):
+    def __init__(self, worldSize: int, debug: bool):
         self.debugMode = debug
         self.worldSize = worldSize
         self.state = self.createWorld()
@@ -15,10 +15,12 @@ class World:
         self.gameState = [self.gameTime, self.snake.size]
         self.alive = True
         self.food = None
-        # Start game by moving upwards, consider randomizing this value
-        self.trajectoryInput = Trajectory.UP
 
-    def createWorld(self):
+        # Random choice of start direction upon initialization
+        #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
+        self.trajectoryInput = Trajectory.LEFT
+
+    def createWorld(self) -> np.array:
         world = list()
 
         for row in range(self.worldSize):
@@ -29,18 +31,16 @@ class World:
 
         return np.array(world)
 
-    def updateWorld(self):
-
+    def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
-        if(not self.insideBoundary() or self.selfCollide()):
-            print("You Lose")
+        if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
             return
 
         self.setSnake()         # Set the snake value in the console "world"
-        self.updateFood()
-        self.updateGameState()
+        self.updateFood()       # Set the food value in the console "world"
+        self.updateGameState()  # Update the game timer and the current snake size
 
         if(self.debugMode):
             self.screenClear()  # Clear screen for better "immersion"
@@ -48,51 +48,47 @@ class World:
             print(self.snake)
             print(self.gameState)
 
-    def updateSnakePos(self):
+    def updateSnakePos(self) -> None:
         if(self.snake.head.trajectory != self.trajectoryInput):
-            #print(str(self.snake.head.trajectory) + " - " + str(self.trajectoryInput))
-            self.snake.setHeadTrajectory(self.trajectoryInput)
+            self.snake.head.trajectory = self.trajectoryInput
+            
         self.snake.move()
 
-    def resetWorld(self):
+    def resetWorld(self) -> None:
         self.state.fill(0)
 
-    def printWorld(self):
+    def gameOver(self) -> bool:
+        return not self.OOB() or self.selfCollide()
+        
+    def printWorld(self) -> None:
         print(self.state)
         print("\n")
 
-    def setSnake(self):
+    def setSnake(self) -> None:
         body = self.snake.body
         for b in body:
             x, y = b.location.to_int()
             self.state[x][y] = 1
 
-    def setTrajectoryInput(self, newTrajectory):
+    def setTrajectoryInput(self, newTrajectory: 'Point') -> None:
         self.trajectoryInput = newTrajectory
 
-    def updateGameState(self):
+    def updateGameState(self) -> None:
         self.gameState[0] += 1
         self.gameState[1] = self.snake.size
         
-    def insideBoundary(self):
+    # Consider refactoring further using Point
+    def OOB(self) -> bool:
         x, y = self.snake.head.location.to_int()
-        #print(x < 0, x >= worldSize)
-        #print(y < 0, y >= worldSize)
-        #print(f"(x:{x}, y:{y})")
-        if((x < 0 or x >= self.worldSize) or (y < 0 or y >= self.worldSize)):
-            return False
-        
-        return True
-
-    def selfCollide(self):
+        return not ((x < 0 or x >= self.worldSize) or (y < 0 or y >= self.worldSize))
+            
+    def selfCollide(self) -> bool:
         return self.snake.checkCollision()
 
-    # Ensure food does not spawn on snake
-    def updateFood(self):
-        # If the snake passes a food point, it grows and a new food spawns
+    def updateFood(self) -> None:
         if(self.food == None or self.snake.head.location == self.food):
             freeLocs = list(zip(*np.where(self.state == 0))) # Get map location where snake is not
-            randInt = randint(0, len(freeLocs))
+            randInt = randint(0, len(freeLocs)-1)
             x, y = freeLocs[randInt]
             
             self.food = Point(x, y)
@@ -100,9 +96,9 @@ class World:
 
         else:
             x, y = self.food.to_int()
-            self.state[x][y] = 2 # Console food representation
+            self.state[x][y] = 2 # Console "world" food representation
 
-    def redirect(self, direction):
+    def redirect(self, direction: 'Point') -> None:
         if direction == 'UP':
             print("Up Key Pressed")
             self.trajectoryInput = Trajectory.UP
@@ -116,7 +112,7 @@ class World:
             print("Left Key Pressed")
             self.trajectoryInput = Trajectory.LEFT
 
-    def screenClear(self): 
+    def screenClear(self) -> None: 
         if name == 'nt': 
             _ = system('cls') 
         else: 

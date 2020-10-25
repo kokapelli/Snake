@@ -1,7 +1,7 @@
 import numpy as np
 
 class Block:
-    def __init__(self, spawnLoc, trajectory, adjacent, isHead = False):
+    def __init__(self, spawnLoc: 'Point', trajectory: 'Point', adjacent: 'Block', isHead: bool= False):
         self.isHead = isHead
         self.location = spawnLoc
         self.adjacentBody = adjacent
@@ -11,11 +11,11 @@ class Block:
         else:
             self.nextLocation = self.adjacentBody.location
 
-    def __repr__(self):
-        string = f"({self.location}/{self.trajectory.name})"
+    def __repr__(self) -> str:
+        string = f"({self.location})"
         return string
 
-    def move(self):
+    def move(self) -> None:
         if(not self.isHead):
             self.location = self.nextLocation
             self.nextLocation = self.adjacentBody.location

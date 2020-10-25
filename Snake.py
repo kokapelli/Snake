@@ -2,65 +2,43 @@ from Block import Block
 from Movement import Point, Trajectory
 import numpy as np
 
-
 class Snake:
-    def __init__(self, world):
-        #Primarily used to get the world 
-        # size and to establish a random spawn point
+    def __init__(self, world: np.array):
         self.world = world
-        self.head = Block(Point(10, 10), Trajectory.LEFT, None, True)
-        self.body = [self.head]
-        self.size = 1
         self.createInitSnake()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         string = ""
         for i in self.body:
-            if(not i.isHead):
-                string += f"<-{i}"
-            else:
-                string += str(i)
+            string += str(i)
 
         return string
         
-    def move(self):
+    def move(self) -> None:
         for b in self.body:
             b.move()
     
-    def createInitSnake(self, bodyLen=1):
-        #print(self.head)
+    def createInitSnake(self, bodyLen: int=1) -> None:
+        self.head = Block(Point(10, 10), Trajectory.UP, None, True)
+        self.body = [self.head]
+        self.size = 1
         for _ in range(bodyLen):
             self.growSnake()
 
-    def growSnake(self):
+    def growSnake(self) -> None:
         end = self.body[-1]
-        endCoord = end.location
         # Negate trajectory to place the new piece at the back of the snake
-        endTrajectory = end.trajectory
-        bodyPartCoord = endCoord + -endTrajectory.value
-        bodyPart = Block(bodyPartCoord, endTrajectory, end)
+        bodyPartCoord = end.location + -end.trajectory.value
+        bodyPart = Block(bodyPartCoord, end.trajectory, end)
         self.body.append(bodyPart)
         self.size += 1
 
-    def setHeadTrajectory(self, newTrajectory):
-        self.head.trajectory = newTrajectory
-        self.head.trajectoryChange = True
-
-    def getBodyLoc(self):
-        bodyLoc = list()
-        for b in self.body:
-            bodyLoc.append(b.location)
-
-        return bodyLoc
-
-    def getBodyPartLocs(self):
+    def getBodyPartLocs(self) -> list:
         locs = list()
-        # Convert locations to tuples to more easily find collisions
         for b in self.body:
             locs.append(b.location)
         return locs
 
-    def checkCollision(self):
+    def checkCollision(self) -> bool:
         locs = self.getBodyPartLocs()
-        #print(locs, len(locs))
         return len(locs) != len(set(locs))

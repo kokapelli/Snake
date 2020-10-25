@@ -34,16 +34,16 @@ class Point(object):
 
     def __add__(self, other: Union['Point', Tuple[int, int]]) -> 'Point':
         if isinstance(other, tuple) and len(other) == 2:
-            diff_x = self.x + other[0]
-            diff_y = self.y + other[1]
-            return Point(diff_x, diff_y)
+            diffX = self.x + other[0]
+            diffY = self.y + other[1]
+            return Point(diffX, diffY)
         elif isinstance(other, Point):
-            diff_x = self.x + other.x
-            diff_y = self.y + other.y
-            return Point(diff_x, diff_y)
+            diffX = self.x + other.x
+            diffY = self.y + other.y
+            return Point(diffX, diffY)
         return None
 
-    def __neg__(self):
+    def __neg__(self) -> 'Point':
         return Point((self.x*-1), (self.y*-1))
 
     def __hash__(self) -> int:
