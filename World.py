@@ -25,7 +25,6 @@ class World:
         self.updateSnakePos()   # Move the snake by one time unit
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
-            return
 
         self.setSnake()         # Set the snake value in the console "world"
         self.updateFood()       # Set the food value in the console "world"
@@ -42,6 +41,7 @@ class World:
             self.snake.head.trajectory = self.trajectoryInput
             
         self.snake.move()
+        self.snake.look()
 
     def resetWorld(self) -> None:
         self.state.fill(0)
@@ -51,7 +51,6 @@ class World:
         for i in range(1, self.worldSize-1):
             self.state[i][0] = 9
             self.state[i][self.worldSize-1] = 9
-
 
     def gameOver(self) -> bool:
         return not self.OOB() or self.selfCollide()
@@ -93,20 +92,6 @@ class World:
         else:
             x, y = self.food.to_int()
             self.state[x][y] = 2 # Console "world" food representation
-
-    def redirect(self, direction: 'Point') -> None:
-        if direction == 'UP':
-            print("Up Key Pressed")
-            self.trajectoryInput = Trajectory.UP
-        elif direction == 'DOWN':
-            print("Down Key Pressed")
-            self.trajectoryInput = Trajectory.DOWN
-        elif direction == 'RIGHT':
-            print("Right Key Pressed")
-            self.trajectoryInput = Trajectory.RIGHT
-        elif direction == 'LEFT':
-            print("Left Key Pressed")
-            self.trajectoryInput = Trajectory.LEFT
 
     def screenClear(self) -> None: 
         if name == 'nt': 

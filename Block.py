@@ -1,7 +1,12 @@
 import numpy as np
 
 class Block:
-    def __init__(self, spawnLoc: 'Point', trajectory: 'Point', adjacent: 'Block', isHead: bool= False):
+    def __init__(self, 
+                 spawnLoc: 'Point', 
+                 trajectory: 'Point', 
+                 adjacent: 'Block', 
+                 isHead: bool= False):
+                 
         self.isHead = isHead
         self.location = spawnLoc
         self.adjacentBody = adjacent

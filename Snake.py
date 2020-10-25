@@ -1,5 +1,4 @@
 from Block import Block
-from Vision import Vision
 from Movement import Point, Trajectory
 import numpy as np
 
@@ -18,11 +17,21 @@ class Snake:
     def move(self) -> None:
         for b in self.body:
             b.move()
+
+    # Detect the distances to:
+    # Food, Itself, Walls
+    def look(self) -> dict:
+        targetDistances = dict
+        for i in list(Trajectory):
+            if i == Trajectory(-self.head.trajectory.value): continue
+                
+            print(i)
+    
+        return targetDistances
     
     def createInitSnake(self, bodyLen: int=1) -> None:
         startLoc = Point(10, 10)
         self.head = Block(startLoc, Trajectory.UP, None, True)
-        self.vision = Vision(startLoc, self.world)
         self.body = [self.head]
         self.size = 1
         for _ in range(bodyLen):
