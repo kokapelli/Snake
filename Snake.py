@@ -1,4 +1,5 @@
 from Block import Block
+from Vision import Vision
 from Movement import Point, Trajectory
 import numpy as np
 
@@ -19,7 +20,9 @@ class Snake:
             b.move()
     
     def createInitSnake(self, bodyLen: int=1) -> None:
-        self.head = Block(Point(10, 10), Trajectory.UP, None, True)
+        startLoc = Point(10, 10)
+        self.head = Block(startLoc, Trajectory.UP, None, True)
+        self.vision = Vision(startLoc, self.world)
         self.body = [self.head]
         self.size = 1
         for _ in range(bodyLen):

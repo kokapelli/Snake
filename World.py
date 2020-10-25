@@ -9,7 +9,7 @@ class World:
     def __init__(self, worldSize: int, debug: bool):
         self.debugMode = debug
         self.worldSize = worldSize
-        self.state = self.createWorld()
+        self.state = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.snake = Snake.Snake(self)
         self.gameTime = 0
         self.gameState = [self.gameTime, self.snake.size]
@@ -19,17 +19,6 @@ class World:
         # Random choice of start direction upon initialization
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
         self.trajectoryInput = Trajectory.LEFT
-
-    def createWorld(self) -> np.array:
-        world = list()
-
-        for row in range(self.worldSize):
-            row = list()
-            for _ in range(self.worldSize):
-                row.append(0)
-            world.append(row)
-
-        return np.array(world)
 
     def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
@@ -56,6 +45,13 @@ class World:
 
     def resetWorld(self) -> None:
         self.state.fill(0)
+        # Add Walls where required
+        self.state[0].fill(9)
+        self.state[self.worldSize-1].fill(9)
+        for i in range(1, self.worldSize-1):
+            self.state[i][0] = 9
+            self.state[i][self.worldSize-1] = 9
+
 
     def gameOver(self) -> bool:
         return not self.OOB() or self.selfCollide()
@@ -80,7 +76,7 @@ class World:
     # Consider refactoring further using Point
     def OOB(self) -> bool:
         x, y = self.snake.head.location.to_int()
-        return not ((x < 0 or x >= self.worldSize) or (y < 0 or y >= self.worldSize))
+        return not ((x < 1 or x >= self.worldSize-1) or (y < 1 or y >= self.worldSize-1))
             
     def selfCollide(self) -> bool:
         return self.snake.checkCollision()

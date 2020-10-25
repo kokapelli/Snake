@@ -9,7 +9,7 @@ DEBUG = False
 class GUI:
     def __init__(self, size: int):
         self.size = size
-        self.squareNr = 20
+        self.squareNr = 22 # Additional 2 to include horizontal and vertical walls
         self.world = World(self.squareNr, DEBUG)
         self.squareDim = self.size // self.squareNr
 
@@ -46,20 +46,24 @@ class GUI:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="AntiqueWhite1")
                 elif(currWorldState[row][col] == 2):
                     self.board.create_rectangle(x1, y1, x2, y2, fill="pale green")
+                elif(currWorldState[row][col] == 9):
+                    self.board.create_rectangle(x1, y1, x2, y2, fill="gray7")
                 else:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="gray15")
 
         if(self.world.alive):
             self.board.after(GAME_SPEED, self.draw)
         else:
-            l = Label(self.master, bg="salmon", text="You Lost!", font=("Helvetica", 30)) 
-            l.place(relx = 0.5, rely = 0.5, anchor = 'center')
-            l.config(width=self.size)
+            self.gameOver()
             return
 
     def resetBoard(self) -> None:
         self.board.delete("all")
 
+    def gameOver(self):
+        l = Label(self.master, bg="salmon", text="You Lost!", font=("Helvetica", 30)) 
+        l.place(relx = 0.5, rely = 0.5, anchor = 'center')
+        l.config(width=self.size)
 
                     #####################
                     ## Keyboard inputs ##
