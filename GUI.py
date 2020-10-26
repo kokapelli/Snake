@@ -3,8 +3,8 @@ from Movement import Trajectory
 from World import World
 import time
 
-GAME_SPEED = 50
 DEBUG = False
+GAME_SPEED = 200 if DEBUG else 50
 
 class GUI:
     def __init__(self, size: int):
@@ -50,6 +50,10 @@ class GUI:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="gray7")
                 else:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="gray15")
+
+                if(DEBUG):
+                    if(currWorldState[row][col] == 8):
+                        self.board.create_rectangle(x1, y1, x2, y2, fill="gray7")
 
         if(self.world.alive):
             self.board.after(GAME_SPEED, self.draw)

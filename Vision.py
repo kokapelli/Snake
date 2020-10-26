@@ -1,17 +1,10 @@
-class Vision:
-    def __init__(self, head: 'Point', state: 'np.array'):
-        self.head = head
-        self.worldState = state
+class Vision():
+    def __init__(self,
+                 dist_to_wall: int,
+                 dist_to_apple: int,
+                 dist_to_self: int
+                 ):
 
-    # Observes 
-    def detectFood(self) -> list:
-        pass
-
-    def detectWall(self) -> list:
-        pass
-
-    def detectSelf(self) -> list:
-        pass
-
-    def targetDetected(self, target) -> bool:
-        pass
+        self.dist_to_wall = dist_to_wall
+        self.dist_to_apple = dist_to_apple
+        self.dist_to_self = dist_to_self

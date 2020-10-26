@@ -1,5 +1,6 @@
 import numpy as np
 import Snake as Snake
+from Vision import Vision
 from Movement import Trajectory, Point
 from random import randint
 
@@ -11,6 +12,7 @@ class World:
         self.worldSize = worldSize
         self.state = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.snake = Snake.Snake(self)
+        self.snakeVision = [None] * len(list(Trajectory))
         self.gameTime = 0
         self.gameState = [self.gameTime, self.snake.size]
         self.alive = True
@@ -23,11 +25,14 @@ class World:
     def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
+        
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
+            return
 
         self.setSnake()         # Set the snake value in the console "world"
         self.updateFood()       # Set the food value in the console "world"
+        self.observeSurroundings()
         self.updateGameState()  # Update the game timer and the current snake size
 
         if(self.debugMode):
@@ -41,11 +46,10 @@ class World:
             self.snake.head.trajectory = self.trajectoryInput
             
         self.snake.move()
-        self.snake.look()
 
     def resetWorld(self) -> None:
         self.state.fill(0)
-        # Add Walls where required
+        # Add Walls
         self.state[0].fill(9)
         self.state[self.worldSize-1].fill(9)
         for i in range(1, self.worldSize-1):
@@ -53,7 +57,7 @@ class World:
             self.state[i][self.worldSize-1] = 9
 
     def gameOver(self) -> bool:
-        return not self.OOB() or self.selfCollide()
+        return not self.OOB(self.snake.head.location) or self.selfCollide()
         
     def printWorld(self) -> None:
         print(self.state)
@@ -65,6 +69,12 @@ class World:
             x, y = b.location.to_int()
             self.state[x][y] = 1
 
+    def observeSurroundings(self) -> None:
+        for i, direction in enumerate(list(Trajectory)):
+            # Snake can't look behind
+            #if direction == Trajectory(-self.snake.head.trajectory.value): continue
+            self.snakeVision[i] = self.snake.look(direction)
+
     def setTrajectoryInput(self, newTrajectory: 'Point') -> None:
         self.trajectoryInput = newTrajectory
 
@@ -73,8 +83,8 @@ class World:
         self.gameState[1] = self.snake.size
         
     # Consider refactoring further using Point
-    def OOB(self) -> bool:
-        x, y = self.snake.head.location.to_int()
+    def OOB(self, loc: 'Point') -> bool:
+        x, y = loc.to_int()
         return not ((x < 1 or x >= self.worldSize-1) or (y < 1 or y >= self.worldSize-1))
             
     def selfCollide(self) -> bool:

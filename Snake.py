@@ -20,14 +20,28 @@ class Snake:
 
     # Detect the distances to:
     # Food, Itself, Walls
-    def look(self) -> dict:
-        targetDistances = dict
-        for i in list(Trajectory):
-            if i == Trajectory(-self.head.trajectory.value): continue
-                
-            print(i)
-    
-        return targetDistances
+    def look(self, direction: 'Trajectory'):
+        seen      = 0
+        counter   = 1
+        currSpot  = self.head.location
+        wallDist  = None
+        foodDist  = np.inf
+        selfDist  = np.inf
+
+        # Scuffed solution
+        while(self.world.OOB(currSpot)):
+            currSpot += direction.value
+            x, y = currSpot.to_int()
+            seen = self.world.state[x][y]
+
+            if seen == 2: foodDist = counter
+            elif seen == 1: selfDist = counter
+            elif seen == 9: wallDist = counter
+            else: self.world.state[x][y] = 8 # Display the sight of the snake
+
+            counter += 1
+            
+        return foodDist, selfDist, wallDist
     
     def createInitSnake(self, bodyLen: int=1) -> None:
         startLoc = Point(10, 10)

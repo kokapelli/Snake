@@ -43,6 +43,17 @@ class Point(object):
             return Point(diffX, diffY)
         return None
 
+    def __sub__(self, other: Union['Point', Tuple[int, int]]) -> 'Point':
+        if isinstance(other, tuple) and len(other) == 2:
+            diffX = self.x - other[0]
+            diffY = self.y - other[1]
+            return Point(diffX, diffY)
+        elif isinstance(other, Point):
+            diffX = self.x - other.x
+            diffY = self.y - other.y
+            return Point(diffX, diffY)
+        return None
+
     def __neg__(self) -> 'Point':
         return Point((self.x*-1), (self.y*-1))
 
@@ -62,3 +73,7 @@ class Trajectory(Enum):
     DOWN  = Point(1, 0)
     LEFT  = Point(0, -1)
     RIGHT = Point(0, 1)
+    UPLEFT = Point(-1, -1)
+    UPRIGHT = Point(-1, 1)
+    DOWNLEFT = Point(1, -1)
+    DOWNRIGHT = Point(1, 1)
