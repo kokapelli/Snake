@@ -7,8 +7,9 @@ from random import randint
 from os import system, name 
 
 class World:
-    def __init__(self, worldSize: int, debug: bool):
+    def __init__(self, worldSize: int, debug: bool, terminalMode: bool):
         self.debugMode = debug
+        self.terminalMode = terminalMode
         self.worldSize = worldSize
         self.state = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.snake = Snake.Snake(self)
@@ -22,12 +23,15 @@ class World:
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
         self.trajectoryInput = Trajectory.LEFT
 
+        if terminalMode: self.updateWorld()
+
     def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
         self.updateSnakePos()   # Move the snake by one time unit
         
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
+            print("Lost")
             return
 
         self.setSnake()         # Set the snake value in the console "world"
@@ -36,10 +40,21 @@ class World:
         self.updateGameState()  # Update the game timer and the current snake size
 
         if(self.debugMode):
-            self.screenClear()  # Clear screen for better "immersion"
+            #self.screenClear()  # Clear screen for better "immersion"
             self.printWorld()   # Show the user the console snake location  
             print(self.snake)
             print(self.gameState)
+
+        if(self.terminalMode):
+            self.AIMovement()
+            self.updateWorld()
+
+    # Placeholder for the training movement
+    def AIMovement(self):
+        movementList = list(Trajectory)[:4]
+        filteredMovementList = list(filter(lambda s: s != -self.trajectoryInput, movementList))
+        randomTrajec = randint(0, (len(filteredMovementList)-1))
+        self.trajectoryInput = list(filteredMovementList)[randomTrajec]
 
     def updateSnakePos(self) -> None:
         if(self.snake.head.trajectory != self.trajectoryInput):
@@ -71,12 +86,7 @@ class World:
 
     def observeSurroundings(self) -> None:
         for i, direction in enumerate(list(Trajectory)):
-            # Snake can't look behind
-            #if direction == Trajectory(-self.snake.head.trajectory.value): continue
             self.snakeVision[i] = self.snake.look(direction)
-
-    def setTrajectoryInput(self, newTrajectory: 'Point') -> None:
-        self.trajectoryInput = newTrajectory
 
     def updateGameState(self) -> None:
         self.gameState[0] += 1

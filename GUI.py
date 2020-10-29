@@ -3,15 +3,14 @@ from Movement import Trajectory
 from World import World
 import time
 
-DEBUG = False
-GAME_SPEED = 200 if DEBUG else 50
-
 class GUI:
-    def __init__(self, size: int):
+    def __init__(self, size: int, debug: bool):
+        self.debug = debug
         self.size = size
         self.squareNr = 22 # Additional 2 to include horizontal and vertical walls
-        self.world = World(self.squareNr, DEBUG)
+        self.world = World(self.squareNr, debug, False)
         self.squareDim = self.size // self.squareNr
+        self.gameSpeed = 200 if debug else 50
 
         self.createBoard()
 
@@ -51,12 +50,12 @@ class GUI:
                 else:
                     self.board.create_rectangle(x1, y1, x2, y2, fill="gray15")
 
-                if(DEBUG):
+                if(self.debug):
                     if(currWorldState[row][col] == 8):
                         self.board.create_rectangle(x1, y1, x2, y2, fill="gray7")
 
         if(self.world.alive):
-            self.board.after(GAME_SPEED, self.draw)
+            self.board.after(self.gameSpeed, self.draw)
         else:
             self.gameOver()
             return
@@ -78,22 +77,22 @@ class GUI:
     def leftKey(self, _) -> None:
         if(self.world.snake.head.trajectory == Trajectory.RIGHT):
             return
-        self.world.setTrajectoryInput(Trajectory.LEFT)
+        self.world.trajectoryInput = Trajectory.LEFT
 
     def rightKey(self, _) -> None:
         if(self.world.snake.head.trajectory == Trajectory.LEFT):
             return
-        self.world.setTrajectoryInput(Trajectory.RIGHT)
+        self.world.trajectoryInput = Trajectory.RIGHT
 
     def upKey(self, _) -> None:
         if(self.world.snake.head.trajectory == Trajectory.DOWN):
             return
-        self.world.setTrajectoryInput(Trajectory.UP)
+        self.world.trajectoryInput = Trajectory.UP
 
     def downKey(self, _) -> None:
         if(self.world.snake.head.trajectory == Trajectory.UP):
             return
-        self.world.setTrajectoryInput(Trajectory.DOWN)
+        self.world.trajectoryInput = Trajectory.DOWN
 
     def exit(self, event) -> None:
         sys.exit()

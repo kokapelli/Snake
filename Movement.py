@@ -21,10 +21,6 @@ class Point(object):
     def to_int(self) -> int:
         return self.x, self.y
 
-    @classmethod
-    def from_dict(cls, d: Dict[str, int]) -> 'Point':
-        return Point(d['x'], d['y'])
-
     def __eq__(self, other: Union['Point', Tuple[int, int]]) -> bool:
         if isinstance(other, tuple) and len(other) == 2:
             return other[0] == self.x and other[1] == self.y
@@ -36,10 +32,12 @@ class Point(object):
         if isinstance(other, tuple) and len(other) == 2:
             diffX = self.x + other[0]
             diffY = self.y + other[1]
+            
             return Point(diffX, diffY)
         elif isinstance(other, Point):
             diffX = self.x + other.x
             diffY = self.y + other.y
+
             return Point(diffX, diffY)
         return None
 
@@ -47,22 +45,23 @@ class Point(object):
         if isinstance(other, tuple) and len(other) == 2:
             diffX = self.x - other[0]
             diffY = self.y - other[1]
+
             return Point(diffX, diffY)
         elif isinstance(other, Point):
             diffX = self.x - other.x
             diffY = self.y - other.y
+
             return Point(diffX, diffY)
         return None
 
     def __neg__(self) -> 'Point':
         return Point((self.x*-1), (self.y*-1))
 
-    def __hash__(self) -> int:
-        return hash((self.x, self.y))
-
     def __repr__(self) -> str:
         return '({}, {})'.format(self.x, self.y)
 
+    def __hash__(self) -> int:
+        return hash((self.x, self.y))
 
 # (-1, 0) Move Up 
 # (1, 0) Move Down
@@ -77,3 +76,12 @@ class Trajectory(Enum):
     UPRIGHT = Point(-1, 1)
     DOWNLEFT = Point(1, -1)
     DOWNRIGHT = Point(1, 1)
+
+    # Ugly temporary solution
+
+
+    def __neg__(self) -> 'Point':
+        if self == self.UP : return self.DOWN
+        elif self == self.DOWN : return self.UP
+        elif self == self.LEFT : return self.RIGHT
+        elif self == self.RIGHT : return self.LEFT
