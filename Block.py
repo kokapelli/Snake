@@ -26,4 +26,3 @@ class Block:
             self.nextLocation = self.adjacentBody.location
         else:
             self.location = self.location + self.trajectory.value
-        

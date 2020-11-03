@@ -1,23 +1,29 @@
 import numpy as np
 import Snake as Snake
-from Vision import Vision
 from Movement import Trajectory, Point
 from random import randint
 
-from os import system, name 
+from os import system, name
+
+INPUT_NODES = 32
 
 class World:
     def __init__(self, worldSize: int, debug: bool, terminalMode: bool):
-        self.debugMode = debug
-        self.terminalMode = terminalMode
-        self.worldSize = worldSize
-        self.state = np.empty([self.worldSize, self.worldSize], dtype=int)
-        self.snake = Snake.Snake(self)
-        self.snakeVision = [None] * len(list(Trajectory))
-        self.gameTime = 0
-        self.gameState = [self.gameTime, self.snake.size]
-        self.alive = True
-        self.food = None
+        self.debugMode       = debug
+        self.terminalMode    = terminalMode
+        self.worldSize       = worldSize
+        self.state           = np.empty([self.worldSize, self.worldSize], dtype=int)
+        self.snake           = Snake.Snake(self)
+        self.snakePerception = list()
+        self.gameTime        = 0
+        self.gameState       = [self.gameTime, self.snake.size]
+        self.alive           = True
+        self.food            = None
+
+        # AI related members
+        # Time steps until game resets
+        self.resetThresh = 100
+        self.resetCount  = 0
 
         # Random choice of start direction upon initialization
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
@@ -27,6 +33,7 @@ class World:
 
     def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
+        self.updateGameState()  # Update the game timer and the current snake size
         self.updateSnakePos()   # Move the snake by one time unit
         
         if(self.gameOver()):    # Check for self collision or out out bounds
@@ -37,14 +44,14 @@ class World:
         self.setSnake()         # Set the snake value in the console "world"
         self.updateFood()       # Set the food value in the console "world"
         self.observeSurroundings()
-        self.updateGameState()  # Update the game timer and the current snake size
-
+        
         if(self.debugMode):
             #self.screenClear()  # Clear screen for better "immersion"
             self.printWorld()   # Show the user the console snake location  
             print(self.snake)
-            print(self.gameState)
-
+            print(self.gameState, self.resetCount)
+        #print("\n", self.snakePerception)
+        #self.AIMovement()
         if(self.terminalMode):
             self.AIMovement()
             self.updateWorld()
@@ -85,12 +92,20 @@ class World:
             self.state[x][y] = 1
 
     def observeSurroundings(self) -> None:
+        self.snakePerception = list()
         for i, direction in enumerate(list(Trajectory)):
-            self.snakeVision[i] = self.snake.look(direction)
-
+            f, s, w = self.snake.look(direction)
+            self.snakePerception += [f, s, w]
+        
+        self.snakePerception += self.snake.head.trajectory.OHE()
+        self.snakePerception += self.snake.getTailTrajectory().OHE()
+        #print("\n", len(self.snakePerception), self.snakePerception)
+        
     def updateGameState(self) -> None:
-        self.gameState[0] += 1
-        self.gameState[1] = self.snake.size
+        self.gameState[0]  += 1
+        self.gameState[1]   = self.snake.size
+        self.resetCount    += 1
+        if self.resetCount == self.resetThresh: self.alive = False
         
     # Consider refactoring further using Point
     def OOB(self, loc: 'Point') -> bool:
@@ -108,6 +123,7 @@ class World:
             
             self.food = Point(x, y)
             self.snake.growSnake()
+            self.resetCount = 0
 
         else:
             x, y = self.food.to_int()

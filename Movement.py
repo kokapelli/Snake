@@ -81,7 +81,18 @@ class Trajectory(Enum):
 
 
     def __neg__(self) -> 'Point':
-        if self == self.UP : return self.DOWN
-        elif self == self.DOWN : return self.UP
-        elif self == self.LEFT : return self.RIGHT
+        if   self == self.UP    : return self.DOWN
+        elif self == self.DOWN  : return self.UP
+        elif self == self.LEFT  : return self.RIGHT
         elif self == self.RIGHT : return self.LEFT
+
+    def __repr__(self) -> list:
+        print("HEre")
+        
+
+    # One hot encoding
+    def OHE(self) -> list:
+        if   self == self.UP    : return [1, 0 ,0 ,0]
+        elif self == self.DOWN  : return [0, 1 ,0 ,0]
+        elif self == self.LEFT  : return [0, 0 ,1 ,0]
+        elif self == self.RIGHT : return [0, 0 ,0 ,1]

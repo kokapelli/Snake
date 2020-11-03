@@ -20,7 +20,7 @@ class Snake:
 
     # Detect the distances to:
     # Food, Itself, Walls
-    def look(self, direction: 'Trajectory'):
+    def look(self, direction: 'Trajectory') -> float:
         seen      = 0
         counter   = 1
         currSpot  = self.head.location
@@ -34,20 +34,21 @@ class Snake:
             x, y = currSpot.to_int()
             seen = self.world.state[x][y]
 
-            if seen == 2: foodDist = counter
-            elif seen == 1: selfDist = counter
-            elif seen == 9: wallDist = counter
-            else: self.world.state[x][y] = 8 # Display the sight of the snake
+            if   seen == 2: foodDist = 1/counter # Normalizing
+            elif seen == 1: selfDist = 1/counter # Normalizing
+            elif seen == 9: wallDist = 1/counter # Normalizing
+            else: self.world.state[x][y] = 8     # Display the sight of the snake
 
             counter += 1
             
         return foodDist, selfDist, wallDist
     
     def createInitSnake(self, bodyLen: int=1) -> None:
-        startLoc = Point(10, 10)
+        startLoc  = Point(10, 10)
         self.head = Block(startLoc, Trajectory.UP, None, True)
         self.body = [self.head]
         self.size = 1
+
         for _ in range(bodyLen):
             self.growSnake()
 
@@ -68,3 +69,9 @@ class Snake:
     def checkCollision(self) -> bool:
         locs = self.getBodyPartLocs()
         return len(locs) != len(set(locs))
+
+    def getTailTrajectory(self) -> list:
+        b2 = self.body[-2].location
+        b1 = self.body[-1].location
+        diff = b2 - b1
+        return Trajectory(diff)
