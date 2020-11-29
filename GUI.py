@@ -32,7 +32,7 @@ class GUI:
     def draw(self) -> None:
         self.resetBoard()
         self.world.updateWorld()
-        currWorldState = self.world.state
+        currWorldState = self.world.worldState
 
         for row in range(self.squareNr):
             for col in range(self.squareNr):

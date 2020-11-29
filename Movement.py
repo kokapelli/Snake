@@ -1,5 +1,6 @@
 from typing import Tuple, Union, Dict
 from enum import Enum
+from random import randrange
 
 class Point(object):
     __slots__ = ('x', 'y')
@@ -79,16 +80,11 @@ class Trajectory(Enum):
 
     # Ugly temporary solution
 
-
     def __neg__(self) -> 'Point':
         if   self == self.UP    : return self.DOWN
         elif self == self.DOWN  : return self.UP
         elif self == self.LEFT  : return self.RIGHT
         elif self == self.RIGHT : return self.LEFT
-
-    def __repr__(self) -> list:
-        print("HEre")
-        
 
     # One hot encoding
     def OHE(self) -> list:
@@ -96,3 +92,9 @@ class Trajectory(Enum):
         elif self == self.DOWN  : return [0, 1 ,0 ,0]
         elif self == self.LEFT  : return [0, 0 ,1 ,0]
         elif self == self.RIGHT : return [0, 0 ,0 ,1]
+
+    # Random movement
+    def randomTrajectory(self) -> 'Trajectory':
+        movementList = list(Trajectory)[:4]
+        randomTrajec = randrange(0, len(movementList))
+        return list(movementList)[randomTrajec]

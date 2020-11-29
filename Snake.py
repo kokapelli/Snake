@@ -32,15 +32,20 @@ class Snake:
         while(self.world.OOB(currSpot)):
             currSpot += direction.value
             x, y = currSpot.to_int()
-            seen = self.world.state[x][y]
+            seen = self.world.worldState[x][y]
 
-            if   seen == 2: foodDist = 1/counter # Normalizing
-            elif seen == 1: selfDist = 1/counter # Normalizing
-            elif seen == 9: wallDist = 1/counter # Normalizing
-            else: self.world.state[x][y] = 8     # Display the sight of the snake
+            # Generates sketchy values. Right next to food = 1, next 0.5 -> 0.33 -> 0.25 -> 0.2...
+            if   seen == 2: foodDist = float("{:.4f}".format(1/counter)) # Normalizing
+            elif seen == 1: selfDist = float("{:.4f}".format(1/counter)) # Normalizing
+            elif seen == 9: wallDist = float("{:.4f}".format(1/counter)) # Normalizing
+            else: self.world.worldState[x][y] = 8     # Display the sight of the snake
 
             counter += 1
-            
+        
+        # Revamp at a later stage
+        if foodDist == np.inf: foodDist = 1/foodDist
+        if selfDist == np.inf: selfDist = 1/selfDist
+
         return foodDist, selfDist, wallDist
     
     def createInitSnake(self, bodyLen: int=1) -> None:

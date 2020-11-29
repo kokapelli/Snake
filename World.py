@@ -7,14 +7,24 @@ from os import system, name
 
 INPUT_NODES = 32
 
+# Consider refactoring to have all 
+# settings in config.json 
 class World:
-    def __init__(self, worldSize: int, debug: bool, terminalMode: bool):
+    def __init__(self, 
+                 worldSize: int, 
+                 debug: bool, 
+                 terminalMode: bool):
+
         self.debugMode       = debug
         self.terminalMode    = terminalMode
         self.worldSize       = worldSize
-        self.state           = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.snake           = Snake.Snake(self)
-        self.snakePerception = list()
+        
+        #[(Food, Snake, Wall)*8, Snake Direction, Tail Direction]
+        self.worldState      = np.empty([self.worldSize, self.worldSize], dtype=int)
+        # State Space
+        self.stateSpace      = list()
+        #self.observeSurroundings()
         self.gameTime        = 0
         self.gameState       = [self.gameTime, self.snake.size]
         self.alive           = True
@@ -24,12 +34,16 @@ class World:
         # Time steps until game resets
         self.resetThresh = 100
         self.resetCount  = 0
+        self.reward = 0
 
         # Random choice of start direction upon initialization
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
         self.trajectoryInput = Trajectory.LEFT
 
-        if terminalMode: self.updateWorld()
+        # *** Scuffed solution ***
+        # Causes an update to take place in the world before the user can perform
+        # an input. Snake spawn location must be changed accordingly.
+        self.updateWorld()
 
     def updateWorld(self) -> None:
         self.resetWorld()       # Reset the world of prior snake locations
@@ -38,7 +52,7 @@ class World:
         
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
-            print("Lost")
+            self.reward -= 500
             return
 
         self.setSnake()         # Set the snake value in the console "world"
@@ -50,18 +64,24 @@ class World:
             self.printWorld()   # Show the user the console snake location  
             print(self.snake)
             print(self.gameState, self.resetCount)
-        #print("\n", self.snakePerception)
-        #self.AIMovement()
-        if(self.terminalMode):
-            self.AIMovement()
-            self.updateWorld()
+            print(self.stateSpace)
 
     # Placeholder for the training movement
-    def AIMovement(self):
-        movementList = list(Trajectory)[:4]
-        filteredMovementList = list(filter(lambda s: s != -self.trajectoryInput, movementList))
-        randomTrajec = randint(0, (len(filteredMovementList)-1))
-        self.trajectoryInput = list(filteredMovementList)[randomTrajec]
+    def step(self, action):
+        parsedAction = None
+        if action == 0:
+            parsedAction = Trajectory.UP
+        if action == 1:
+            parsedAction = Trajectory.DOWN
+        if action == 2:
+            parsedAction = Trajectory.LEFT
+        if action == 3:
+            parsedAction = Trajectory.RIGHT
+
+        if not self.snake.head.trajectory == -parsedAction: self.trajectoryInput = parsedAction
+        self.updateWorld()
+
+        return self.stateSpace, self.reward, self.alive
 
     def updateSnakePos(self) -> None:
         if(self.snake.head.trajectory != self.trajectoryInput):
@@ -70,36 +90,36 @@ class World:
         self.snake.move()
 
     def resetWorld(self) -> None:
-        self.state.fill(0)
+        self.worldState.fill(0)
         # Add Walls
-        self.state[0].fill(9)
-        self.state[self.worldSize-1].fill(9)
+        self.worldState[0].fill(9)
+        self.worldState[self.worldSize-1].fill(9)
         for i in range(1, self.worldSize-1):
-            self.state[i][0] = 9
-            self.state[i][self.worldSize-1] = 9
+            self.worldState[i][0] = 9
+            self.worldState[i][self.worldSize-1] = 9
 
     def gameOver(self) -> bool:
         return not self.OOB(self.snake.head.location) or self.selfCollide()
         
     def printWorld(self) -> None:
-        print(self.state)
+        print(self.worldState)
         print("\n")
 
     def setSnake(self) -> None:
         body = self.snake.body
         for b in body:
             x, y = b.location.to_int()
-            self.state[x][y] = 1
+            self.worldState[x][y] = 1
 
     def observeSurroundings(self) -> None:
-        self.snakePerception = list()
+        self.stateSpace.clear()
         for i, direction in enumerate(list(Trajectory)):
             f, s, w = self.snake.look(direction)
-            self.snakePerception += [f, s, w]
+            self.stateSpace      += [f, s, w]
         
-        self.snakePerception += self.snake.head.trajectory.OHE()
-        self.snakePerception += self.snake.getTailTrajectory().OHE()
-        #print("\n", len(self.snakePerception), self.snakePerception)
+        self.stateSpace      += self.snake.head.trajectory.OHE()
+        self.stateSpace      += self.snake.getTailTrajectory().OHE()
+        #print("\n", len(self.stateSpace)    , self.stateSpace)  
         
     def updateGameState(self) -> None:
         self.gameState[0]  += 1
@@ -117,17 +137,19 @@ class World:
 
     def updateFood(self) -> None:
         if(self.food == None or self.snake.head.location == self.food):
-            freeLocs = list(zip(*np.where(self.state == 0))) # Get map location where snake is not
+            freeLocs = list(zip(*np.where(self.worldState == 0))) # Get map location where snake is not
             randInt = randint(0, len(freeLocs)-1)
             x, y = freeLocs[randInt]
             
             self.food = Point(x, y)
             self.snake.growSnake()
-            self.resetCount = 0
 
+            # AI related variables
+            self.resetCount = 0
+            if self.gameState[0] != 1: self.reward += 100
         else:
             x, y = self.food.to_int()
-            self.state[x][y] = 2 # Console "world" food representation
+            self.worldState[x][y] = 2 # Console "world" food representation
 
     def screenClear(self) -> None: 
         if name == 'nt': 
