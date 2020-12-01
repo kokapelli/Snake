@@ -41,9 +41,7 @@ class Train:
                  reward: int, 
                  nextState: list, 
                  alive: bool) -> None:
-        #print(f"\nRemembering: {action}, {reward}, {alive}")
-        #print(f"State: {state}")
-        #print(f"Next State: {nextState}")
+                 
         self.memory.append((state, action, reward, nextState, alive))
 
     # Performs snake movement from memory
@@ -67,8 +65,6 @@ class Train:
         dones       = np.array([i[4] for i in minibatch])
         states      = np.squeeze(states)
         nextState   = np.squeeze(nextState)
-        #states      = np.squeeze(states).astype('float32')
-        #nextState   = np.squeeze(nextState).astype('float32')
         targets     = rewards + self.params['gamma']*(np.amax(self.model.predict_on_batch(nextState), axis=1))*(1-dones)
 
         targetsFull = self.model.predict_on_batch(states)
@@ -90,7 +86,7 @@ class Train:
         jsonModel = weights.read()
         weights.close()
         loaded_model = model_from_json(jsonModel)
-        loaded_model.load_weights("model.h5")
+        loaded_model.load_weights("weights/model.h5")
         loaded_model.compile(loss='mse', optimizer=Adam(lr=self.params['learning_rate']))
 
         return loaded_model
@@ -124,7 +120,6 @@ def train(load: bool) -> [int]:
             nextState, reward, alive = env.step(action)
             score    += reward
             nextState = np.reshape(nextState, (1, len(nextState)))
-            #print(len(state[0]), state)
             agent.remember(state, action, reward, nextState, alive)
             state = nextState
             
@@ -141,27 +136,6 @@ def train(load: bool) -> [int]:
         rewardSums.append(score)
     return rewardSums
 
-# Play from saved model weights
-def play(load: bool) -> None:
-    params    = loadParams()
-    config    = loadGameConfig()
-    worldSize = config["square_number"]
-    agent     = Train(params, load)
-
-    game      = GUI(660, False, agent)
-    env       = game.world
-    state     = np.reshape(env.stateSpace, (1, params['state_space']))
-    alive     = True
-
-    while(alive):
-        action = agent.action(state)
-        #game.draw()
-        #game.master.mainloop()
-        env.step(action)
-        state, _, alive = env.step(action)
-
 if __name__ == '__main__':
     loadModel = True
-    play(loadModel)
-    #rewards = train(loadModel)
-    #print(rewards)
+    rewards = train(loadModel)

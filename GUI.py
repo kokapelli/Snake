@@ -37,7 +37,7 @@ class GUI:
         self.resetBoard()
         if(self.agent):
             action = self.agent.action(self.state)
-            state, _, alive = self.world.step(action)
+            state, _, _ = self.world.step(action)
         else:
             self.world.updateWorld()
 
