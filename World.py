@@ -1,5 +1,6 @@
 import numpy as np
 import Snake as Snake
+from typing import Tuple
 from Movement import Trajectory, Point
 from random import randint
 
@@ -67,7 +68,7 @@ class World:
             print(self.stateSpace)
 
     # Placeholder for the training movement
-    def step(self, action):
+    def step(self, action: int) -> Tuple[list, int, bool]:
         parsedAction = None
         if action == 0:
             parsedAction = Trajectory.UP

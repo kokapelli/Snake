@@ -1,17 +1,17 @@
 from tkinter import *
 from Movement import Trajectory
 from World import World
+import numpy as np
 import time
 
 class GUI:
-    def __init__(self, size: int, debug: bool):
-        self.debug = debug
-        self.size = size
-        self.squareNr = 22 # Additional 2 to include horizontal and vertical walls
-        self.world = World(self.squareNr, debug, False)
+    def __init__(self, size: int, debug: bool, agent: 'model' = None):
+        self.debug     = debug
+        self.size      = size
+        self.squareNr  = 22 # Additional 2 to include horizontal and vertical walls
+        self.world     = World(self.squareNr, debug, False)
         self.squareDim = self.size // self.squareNr
         self.gameSpeed = 200 if debug else 50
-
         self.createBoard()
 
         self.board.bind('<Left>', self.leftKey)
@@ -22,6 +22,10 @@ class GUI:
         self.board.focus_set()
         self.board.pack()
 
+        # AI related members
+        self.agent = agent
+        self.state = np.reshape(self.world.stateSpace, (1, 32))
+
     def createBoard(self) -> None:
         self.master = Tk()
         self.master.resizable(False, False)
@@ -31,7 +35,12 @@ class GUI:
 
     def draw(self) -> None:
         self.resetBoard()
-        self.world.updateWorld()
+        if(self.agent):
+            action = self.agent.action(self.state)
+            state, _, alive = self.world.step(action)
+        else:
+            self.world.updateWorld()
+
         currWorldState = self.world.worldState
 
         for row in range(self.squareNr):

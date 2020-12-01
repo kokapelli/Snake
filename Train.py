@@ -1,6 +1,7 @@
 import json
 import numpy as np
 
+from file_processing import *
 from World import World
 from Movement import Trajectory, Point
 from random import randint, randrange, sample
@@ -20,10 +21,8 @@ class Train:
         else:
             self.model  = self.build()
         
-
-    
     # Build the model
-    def build(self):
+    def build(self) -> 'model':
         model = Sequential()
         model.add(Dense(self.params['layer_size'], 
                         input_shape=((self.params['state_space'],)), 
@@ -36,21 +35,26 @@ class Train:
         return model
         
     # Remember state transition
-    def remember(self, state, action, reward, nextState, alive):
+    def remember(self, 
+                 state: list, 
+                 action: int, 
+                 reward: int, 
+                 nextState: list, 
+                 alive: bool) -> None:
         #print(f"\nRemembering: {action}, {reward}, {alive}")
         #print(f"State: {state}")
         #print(f"Next State: {nextState}")
         self.memory.append((state, action, reward, nextState, alive))
 
     # Performs snake movement from memory
-    def action(self, state):
+    def action(self, state) -> int:
         if np.random.rand() <= self.params['epsilon']:
             return randrange(self.params['action_space'])
         actions = self.model.predict(state)
         return np.argmax(actions[0])
 
     # Refactor
-    def replay(self):
+    def replay(self) -> None:
 
         if len(self.memory) < self.params['batch_size']:
             return
@@ -75,44 +79,32 @@ class Train:
         if self.params['epsilon'] > self.params['epsilon_min']:
             self.params['epsilon'] *= self.params['epsilon_decay']
 
-    def saveModel(self):
+    def saveModel(self) -> None:
         jsonModel = self.model.to_json()
         with open("weights/model.json", "w") as json_file:
             json_file.write(jsonModel)
         self.model.save_weights("weights/model.h5")
 
-    def loadModel(self):
+    def loadModel(self) -> 'model':
         weights = open('weights/model.json', 'r')
         jsonModel = weights.read()
         weights.close()
         loaded_model = model_from_json(jsonModel)
         loaded_model.load_weights("model.h5")
         loaded_model.compile(loss='mse', optimizer=Adam(lr=self.params['learning_rate']))
+
         return loaded_model
         print("Loaded model from disk")
 
-# Load Game configurations
-def loadGameConfig():
-    with open('config.json') as json_file:
-        config = json.load(json_file)
-    return config
-
-# Load network parameter config
-def loadParams():
-    with open('params.json') as json_file:
-        params = json.load(json_file)
-    return params
-
 # Placeholder for the training movement
-def randomAIMovement():
+def randomAIMovement() -> 'Trajectory':
     movementList = list(Trajectory)[:4]
     randomTrajec = randrange(0, len(movementList))
     return list(movementList)[randomTrajec]
 
 # Train the AI
-def train(load):
+def train(load: bool) -> [int]:
     rewardSums = []
-    episodes = 1
     config   = loadGameConfig()
     params   = loadParams()
 
@@ -149,7 +141,27 @@ def train(load):
         rewardSums.append(score)
     return rewardSums
 
+# Play from saved model weights
+def play(load: bool) -> None:
+    params    = loadParams()
+    config    = loadGameConfig()
+    worldSize = config["square_number"]
+    agent     = Train(params, load)
+
+    game      = GUI(660, False, agent)
+    env       = game.world
+    state     = np.reshape(env.stateSpace, (1, params['state_space']))
+    alive     = True
+
+    while(alive):
+        action = agent.action(state)
+        #game.draw()
+        #game.master.mainloop()
+        env.step(action)
+        state, _, alive = env.step(action)
+
 if __name__ == '__main__':
     loadModel = True
-    rewards = train(loadModel)
-    print(rewards)
+    play(loadModel)
+    #rewards = train(loadModel)
+    #print(rewards)
