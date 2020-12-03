@@ -1,4 +1,6 @@
 import json
+import time
+import argparse
 import numpy as np
 
 from file_processing import *
@@ -10,6 +12,11 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import model_from_json
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--load', help='Loads pre-existing weights for training',
+                    action='store_true')
+args = parser.parse_args()
 
 class Train:
     def __init__(self, params, load):
@@ -88,9 +95,9 @@ class Train:
         loaded_model = model_from_json(jsonModel)
         loaded_model.load_weights("weights/model.h5")
         loaded_model.compile(loss='mse', optimizer=Adam(lr=self.params['learning_rate']))
+        print("Loaded model from disk")
 
         return loaded_model
-        print("Loaded model from disk")
 
 # Placeholder for the training movement
 def randomAIMovement() -> 'Trajectory':
@@ -100,19 +107,20 @@ def randomAIMovement() -> 'Trajectory':
 
 # Train the AI
 def train(load: bool) -> [int]:
-    rewardSums = []
-    config   = loadGameConfig()
-    params   = loadParams()
-
-    worldSize = config["square_number"]
-    debug     = config["debug"]
-    terminal  = config["terminal_mode"]
-    agent     = Train(params, load)
+    rewardSums  = []
+    scoreSample = []
+    config      = loadGameConfig()
+    params      = loadParams()
+    worldSize   = config["square_number"]
+    debug       = config["debug"]
+    terminal    = config["terminal_mode"]
+    agent       = Train(params, load)
 
     for e in range(params['episodes']):
         score = 0
         env   = World(worldSize, debug, terminal)
         state = np.reshape(env.stateSpace, (1, params['state_space']))
+        start = time.time()
         
         for i in range(params['max_steps']):
             action    = agent.action(state)
@@ -130,12 +138,17 @@ def train(load: bool) -> [int]:
                 break
 
         if(0 == (e % params['save_interval'])):
-            print(f"Saving model: [{e}/{params['episodes']}]")
+            print(f"Saving model: [{e}/{params['episodes']}] -> {((time.time() - start)/5):.2f} avg time/episode")
+            print(f"{scoreSample}: <mean: {np.mean(scoreSample):.2f} | std:{np.std(scoreSample):.2f}>\n")
             agent.saveModel()
+            scoreSample = []
 
+        scoreSample.append(score)
         rewardSums.append(score)
+
     return rewardSums
 
 if __name__ == '__main__':
-    loadModel = True
-    rewards = train(loadModel)
+    rewards = train(args.load)
+    # Could be used for plotting
+    print(rewards)
