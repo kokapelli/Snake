@@ -43,7 +43,7 @@ def AIGame():
     game.master.mainloop()
 
 if __name__ == "__main__":
-    if(AI):
-        AIGame()
-    else:
-        startGame()
+    #if(AI):
+    AIGame()
+    #else:
+    #    startGame()

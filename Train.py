@@ -20,13 +20,15 @@ args = parser.parse_args()
 
 class Train:
     def __init__(self, params, load):
-        self.params = params
-        self.memory = deque(maxlen=2500)
+        self.params  = params
+        self.memory  = deque(maxlen=2500)
 
         if(load):
-            self.model = self.loadModel()
+            self.epsilon = self.params['epsilon_min']
+            self.model   = self.loadModel()
         else:
-            self.model  = self.build()
+            self.epsilon = self.params['epsilon']
+            self.model   = self.build()
         
     # Build the model
     def build(self) -> 'model':
@@ -53,8 +55,13 @@ class Train:
 
     # Performs snake movement from memory
     def action(self, state) -> int:
-        if np.random.rand() <= self.params['epsilon']:
+        if np.random.rand() <= self.epsilon:
             return randrange(self.params['action_space'])
+        actions = self.model.predict(state)
+        return np.argmax(actions[0])
+
+    # Predicts the best action during gameplay
+    def playAction(self, state) -> int:
         actions = self.model.predict(state)
         return np.argmax(actions[0])
 
@@ -79,14 +86,14 @@ class Train:
         targetsFull[[ind], [actions]] = targets
 
         self.model.fit(states, targetsFull, epochs=1, verbose=0)
-        if self.params['epsilon'] > self.params['epsilon_min']:
-            self.params['epsilon'] *= self.params['epsilon_decay']
+        if self.epsilon > self.params['epsilon_min']:
+            self.epsilon -= self.epsilon * self.params['epsilon_decay']
 
     def saveModel(self) -> None:
         jsonModel = self.model.to_json()
-        with open("weights/model.json", "w") as json_file:
+        with open("weights/model2.json", "w") as json_file:
             json_file.write(jsonModel)
-        self.model.save_weights("weights/model.h5")
+        self.model.save_weights("weights/model2.h5")
 
     def loadModel(self) -> 'model':
         weights = open('weights/model.json', 'r')
@@ -150,5 +157,6 @@ def train(load: bool) -> [int]:
 
 if __name__ == '__main__':
     rewards = train(args.load)
+    
     # Could be used for plotting
-    print(rewards)
+    #print(rewards)

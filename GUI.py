@@ -36,8 +36,9 @@ class GUI:
     def draw(self) -> None:
         self.resetBoard()
         if(self.agent):
-            action = self.agent.action(self.state)
+            action  = self.agent.playAction([self.state])
             state, _, _ = self.world.step(action)
+            self.state = state
         else:
             self.world.updateWorld()
 
