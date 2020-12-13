@@ -96,11 +96,11 @@ class Train:
         self.model.save_weights("weights/model2.h5")
 
     def loadModel(self) -> 'model':
-        weights = open('weights/model.json', 'r')
+        weights = open('weights/model2.json', 'r')
         jsonModel = weights.read()
         weights.close()
         loaded_model = model_from_json(jsonModel)
-        loaded_model.load_weights("weights/model.h5")
+        loaded_model.load_weights("weights/model2.h5")
         loaded_model.compile(loss='mse', optimizer=Adam(lr=self.params['learning_rate']))
         print("Loaded model from disk")
 
@@ -145,8 +145,9 @@ def train(load: bool) -> [int]:
                 break
 
         if(0 == (e % params['save_interval'])):
-            print(f"Saving model: [{e}/{params['episodes']}] -> {((time.time() - start)/5):.2f} avg time/episode")
-            print(f"{scoreSample}: <mean: {np.mean(scoreSample):.2f} | std:{np.std(scoreSample):.2f}>\n")
+            print(f"\nSaving model: [{e}/{params['episodes']}] -> {((time.time() - start)/5):.2f} avg time/episode")
+            print(f"Sample  Mean: <{np.mean(scoreSample):.2f}>: {scoreSample}")
+            print(f"Total   Mean: <{np.mean(rewardSums):.2f}> [{len(rewardSums)}]")
             agent.saveModel()
             scoreSample = []
 

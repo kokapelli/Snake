@@ -8,7 +8,7 @@ class GUI:
     def __init__(self, size: int, debug: bool, agent: 'model' = None):
         self.debug     = debug
         self.size      = size
-        self.squareNr  = 22 # Additional 2 to include horizontal and vertical walls
+        self.squareNr  = 12 # Additional 2 to include horizontal and vertical walls
         self.world     = World(self.squareNr, debug, False)
         self.squareDim = self.size // self.squareNr
         self.gameSpeed = 200 if debug else 50

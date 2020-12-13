@@ -3,7 +3,8 @@ from Movement import Point, Trajectory
 import numpy as np
 
 class Snake:
-    def __init__(self, world: np.array):
+    def __init__(self, world: np.array, binary: bool):
+        self.binary = binary
         self.world = world
         self.createInitSnake()
 
@@ -34,11 +35,17 @@ class Snake:
             x, y = currSpot.to_int()
             seen = self.world.worldState[x][y]
 
-            # Generates sketchy values. Right next to food = 1, next 0.5 -> 0.33 -> 0.25 -> 0.2...
-            if   seen == 2: foodDist = float("{:.4f}".format(1/counter)) # Normalizing
-            elif seen == 1: selfDist = float("{:.4f}".format(1/counter)) # Normalizing
-            elif seen == 9: wallDist = float("{:.4f}".format(1/counter)) # Normalizing
-            else: self.world.worldState[x][y] = 8     # Display the sight of the snake
+            if self.binary:
+                if   seen == 2: foodDist = 1
+                elif seen == 1: selfDist = float("{:.4f}".format(1/counter)) # Normalizing
+                elif seen == 9: wallDist = float("{:.4f}".format(1/counter)) # Normalizing
+                else: self.world.worldState[x][y] = 8     # Display the sight of the snake
+            else:
+                # Generates sketchy values. Right next to food = 1, next 0.5 -> 0.33 -> 0.25 -> 0.2...
+                if   seen == 2: foodDist = float("{:.4f}".format(1/counter)) # Normalizing
+                elif seen == 1: selfDist = float("{:.4f}".format(1/counter)) # Normalizing
+                elif seen == 9: wallDist = float("{:.4f}".format(1/counter)) # Normalizing
+                else: self.world.worldState[x][y] = 8     # Display the sight of the snake
 
             counter += 1
         

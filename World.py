@@ -14,28 +14,28 @@ class World:
     def __init__(self, 
                  worldSize: int, 
                  debug: bool, 
-                 terminalMode: bool):
+                 binary: bool):
 
-        self.debugMode       = debug
-        self.terminalMode    = terminalMode
-        self.worldSize       = worldSize
-        self.snake           = Snake.Snake(self)
-        
+        self.debugMode   = debug
+        self.binary      = binary
+        self.worldSize   = worldSize
+        self.snake       = Snake.Snake(self, binary)
         #[(Food, Snake, Wall)*8, Snake Direction, Tail Direction]
-        self.worldState      = np.empty([self.worldSize, self.worldSize], dtype=int)
-        # State Space
-        self.stateSpace      = list()
-        #self.observeSurroundings()
-        self.gameTime        = 0
-        self.gameState       = [self.gameTime, self.snake.size]
-        self.alive           = True
-        self.food            = None
+        self.worldState  = np.empty([self.worldSize, self.worldSize], dtype=int)
+        self.stateSpace  = list()
+        self.gameTime    = 0
+        self.gameState   = [self.gameTime, self.snake.size]
+        self.alive       = True
+        self.food        = None
 
         # AI related members
         # Time steps until game resets
         self.resetThresh = 100
         self.resetCount  = 0
-        self.reward = 0
+        self.reward      = 0
+        self.foodReward  = 300
+        self.collisionPenalty = 500
+        self.timeoutPenalty   = 500
 
         # Random choice of start direction upon initialization
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
@@ -53,7 +53,7 @@ class World:
         
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
-            self.reward -= 500
+            self.reward -= self.collisionPenalty
             return
 
         self.setSnake()         # Set the snake value in the console "world"
@@ -126,7 +126,9 @@ class World:
         self.gameState[0]  += 1
         self.gameState[1]   = self.snake.size
         self.resetCount    += 1
-        if self.resetCount == self.resetThresh: self.alive = False
+        if self.resetCount == self.resetThresh: 
+            self.alive   = False
+            self.reward -= self.timeoutPenalty
         
     # Consider refactoring further using Point
     def OOB(self, loc: 'Point') -> bool:

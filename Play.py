@@ -26,9 +26,7 @@ AI       = args.ai
 # Implement Hamiltonian cycle to complete game
 def startGame():
     
-    if DEBUG and GUI : game = GUI(SIZE, True)
-    else: game = GUI(SIZE, False)
-
+    game = GUI(SIZE, True)
     game.draw()
     game.master.mainloop()
 
@@ -43,7 +41,5 @@ def AIGame():
     game.master.mainloop()
 
 if __name__ == "__main__":
-    #if(AI):
-    AIGame()
-    #else:
-    #    startGame()
+    #AIGame()
+    startGame()
