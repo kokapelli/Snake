@@ -3,6 +3,10 @@ import time
 import argparse
 import numpy as np
 
+
+import tensorflow as tf
+physical_devices = tf.config.list_physical_devices('GPU') 
+tf.config.experimental.set_memory_growth(physical_devices[0], True)
 from file_processing import *
 from World import World
 from Movement import Trajectory, Point
@@ -91,16 +95,16 @@ class Train:
 
     def saveModel(self) -> None:
         jsonModel = self.model.to_json()
-        with open("weights/model2.json", "w") as json_file:
+        with open("weights/model.json", "w") as json_file:
             json_file.write(jsonModel)
-        self.model.save_weights("weights/model2.h5")
+        self.model.save_weights("weights/model.h5")
 
     def loadModel(self) -> 'model':
-        weights = open('weights/model2.json', 'r')
+        weights = open('weights/model.json', 'r')
         jsonModel = weights.read()
         weights.close()
         loaded_model = model_from_json(jsonModel)
-        loaded_model.load_weights("weights/model2.h5")
+        loaded_model.load_weights("weights/model.h5")
         loaded_model.compile(loss='mse', optimizer=Adam(lr=self.params['learning_rate']))
         print("Loaded model from disk")
 

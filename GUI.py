@@ -67,6 +67,7 @@ class GUI:
         if(self.world.alive):
             self.board.after(self.gameSpeed, self.draw)
         else:
+            print(self.world.gameState)
             self.gameOver()
             return
 

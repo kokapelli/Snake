@@ -41,5 +41,5 @@ def AIGame():
     game.master.mainloop()
 
 if __name__ == "__main__":
-    #AIGame()
-    startGame()
+    AIGame()
+    #startGame()

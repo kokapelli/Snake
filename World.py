@@ -24,18 +24,17 @@ class World:
         self.worldState  = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.stateSpace  = list()
         self.gameTime    = 0
-        self.gameState   = [self.gameTime, self.snake.size]
         self.alive       = True
         self.food        = None
+        self.totalReward = 0
 
         # AI related members
-        # Time steps until game resets
-        self.resetThresh = 100
-        self.resetCount  = 0
-        self.reward      = 0
-        self.foodReward  = 300
-        self.collisionPenalty = 500
-        self.timeoutPenalty   = 500
+        self.resetThresh = 100 # Time steps until game resets
+        self.resetCount  = 0   # Counter until game is reset (to prevent loops)
+        self.reward      = 0   # AI Reward
+        self.foodReward  = 100 # Score received for consuming food
+        self.collPenalty = 500 # Collision Penalty
+        self.timePenalty = 500 # Penalty if the snake never eats the food.
 
         # Random choice of start direction upon initialization
         #self.trajectoryInput = list(Trajectory)[randint(0, len(list(Trajectory)))]
@@ -44,6 +43,7 @@ class World:
         # *** Scuffed solution ***
         # Causes an update to take place in the world before the user can perform
         # an input. Snake spawn location must be changed accordingly.
+        self.gameState   = [self.gameTime, self.snake.size, self.totalReward]
         self.updateWorld()
 
     def updateWorld(self) -> None:
@@ -53,7 +53,8 @@ class World:
         
         if(self.gameOver()):    # Check for self collision or out out bounds
             self.alive = False
-            self.reward -= self.collisionPenalty
+            self.totalReward -= self.collPenalty
+            self.reward      -= self.collPenalty
             return
 
         self.setSnake()         # Set the snake value in the console "world"
@@ -67,7 +68,6 @@ class World:
             print(self.gameState, self.resetCount)
             print(self.stateSpace)
 
-    # Placeholder for the training movement
     def step(self, action: int) -> Tuple[list, int, bool]:
         parsedAction = None
         if action == 0:
@@ -120,15 +120,16 @@ class World:
         
         self.stateSpace      += self.snake.head.trajectory.OHE()
         self.stateSpace      += self.snake.getTailTrajectory().OHE()
-        #print("\n", len(self.stateSpace)    , self.stateSpace)  
         
     def updateGameState(self) -> None:
+        self.reward         = 0
         self.gameState[0]  += 1
         self.gameState[1]   = self.snake.size
+        self.gameState[2]   = self.totalReward
         self.resetCount    += 1
         if self.resetCount == self.resetThresh: 
-            self.alive   = False
-            self.reward -= self.timeoutPenalty
+            self.reward    -= self.timePenalty
+            self.alive      = False
         
     # Consider refactoring further using Point
     def OOB(self, loc: 'Point') -> bool:
@@ -149,7 +150,7 @@ class World:
 
             # AI related variables
             self.resetCount = 0
-            if self.gameState[0] != 1: self.reward += 100
+            if self.gameState[0] != 1: self.reward += self.foodReward
         else:
             x, y = self.food.to_int()
             self.worldState[x][y] = 2 # Console "world" food representation
