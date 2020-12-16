@@ -52,7 +52,7 @@ class World:
         self.updateSnakePos()   # Move the snake by one time unit
         
         if(self.gameOver()):    # Check for self collision or out out bounds
-            self.alive = False
+            self.alive        = False
             self.totalReward -= self.collPenalty
             self.reward      -= self.collPenalty
             return

@@ -5,7 +5,7 @@ import numpy as np
 class Snake:
     def __init__(self, world: np.array, binary: bool):
         self.binary = binary
-        self.world = world
+        self.world  = world
         self.createInitSnake()
 
     def __repr__(self) -> str:
@@ -56,7 +56,7 @@ class Snake:
         return foodDist, selfDist, wallDist
     
     def createInitSnake(self, bodyLen: int=1) -> None:
-        startLoc  = Point(10, 10)
+        startLoc  = Point(5, 7)
         self.head = Block(startLoc, Trajectory.UP, None, True)
         self.body = [self.head]
         self.size = 1

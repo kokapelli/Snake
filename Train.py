@@ -158,6 +158,7 @@ def train(load: bool) -> [int]:
         scoreSample.append(score)
         rewardSums.append(score)
 
+    print(f"Best Score: {max(rewardSums)}")
     return rewardSums
 
 if __name__ == '__main__':
