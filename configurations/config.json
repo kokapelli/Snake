@@ -2,5 +2,5 @@
     "square_number": 22,
     "world_size": 660,
     "debug": false,
-    "terminal_mode": true
+    "binary": false
 }

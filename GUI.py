@@ -9,9 +9,9 @@ class GUI:
         self.debug     = debug
         self.size      = size
         self.squareNr  = 12 # Additional 2 to include horizontal and vertical walls
-        self.world     = World(self.squareNr, debug, False)
+        self.world     = World(self.squareNr, debug, False, agent)
         self.squareDim = self.size // self.squareNr
-        self.gameSpeed = 200 if debug else 50
+        self.gameSpeed = 200 if debug else 100
         self.createBoard()
 
         self.board.bind('<Left>', self.leftKey)

@@ -24,9 +24,9 @@ TERMINAL = args.terminal
 AI       = args.ai
 
 # Implement Hamiltonian cycle to complete game
-def startGame():
+def startGame(debug):
     
-    game = GUI(SIZE, True)
+    game = GUI(SIZE, debug)
     game.draw()
     game.master.mainloop()
 
@@ -35,11 +35,11 @@ def AIGame():
     config    = loadGameConfig()
     worldSize = config["square_number"]
     agent     = Train(params, True)
-    game      = GUI(SIZE, False, agent)
+    game      = GUI(SIZE, True, agent)
 
     game.draw()
     game.master.mainloop()
 
 if __name__ == "__main__":
     AIGame()
-    #startGame()
+    #startGame(True)

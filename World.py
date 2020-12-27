@@ -14,12 +14,13 @@ class World:
     def __init__(self, 
                  worldSize: int, 
                  debug: bool, 
-                 binary: bool):
+                 binary: bool,
+                 AI: bool):
 
         self.debugMode   = debug
         self.binary      = binary
         self.worldSize   = worldSize
-        self.snake       = Snake.Snake(self, binary)
+        self.snake       = Snake.Snake(self, binary, AI)
         #[(Food, Snake, Wall)*8, Snake Direction, Tail Direction]
         self.worldState  = np.empty([self.worldSize, self.worldSize], dtype=int)
         self.stateSpace  = list()
@@ -32,7 +33,7 @@ class World:
         self.resetThresh = 100 # Time steps until game resets
         self.resetCount  = 0   # Counter until game is reset (to prevent loops)
         self.reward      = 0   # AI Reward
-        self.foodReward  = 100 # Score received for consuming food
+        self.foodReward  = 200 # Score received for consuming food
         self.collPenalty = 500 # Collision Penalty
         self.timePenalty = 500 # Penalty if the snake never eats the food.
 
@@ -141,16 +142,16 @@ class World:
 
     def updateFood(self) -> None:
         if(self.food == None or self.snake.head.location == self.food):
-            freeLocs = list(zip(*np.where(self.worldState == 0))) # Get map location where snake is not
-            randInt = randint(0, len(freeLocs)-1)
-            x, y = freeLocs[randInt]
-            
+            freeLocs  = list(zip(*np.where(self.worldState == 0))) # Get map location where snake is not
+            randInt   = randint(0, len(freeLocs)-1)
+            x, y      = freeLocs[randInt]
             self.food = Point(x, y)
-            self.snake.growSnake()
-
-            # AI related variables
             self.resetCount = 0
-            if self.gameState[0] != 1: self.reward += self.foodReward
+
+            if self.gameState[0] != 1: 
+                self.reward      += self.foodReward
+                self.totalReward += self.foodReward
+                self.snake.growSnake() # Snake will eat one food upon spawn otherwise
         else:
             x, y = self.food.to_int()
             self.worldState[x][y] = 2 # Console "world" food representation

@@ -26,13 +26,10 @@ class Train:
     def __init__(self, params, load):
         self.params  = params
         self.memory  = deque(maxlen=2500)
+        self.epsilon = self.params['epsilon']
 
-        if(load):
-            self.epsilon = self.params['epsilon_min']
-            self.model   = self.loadModel()
-        else:
-            self.epsilon = self.params['epsilon']
-            self.model   = self.build()
+        if(load): self.model   = self.loadModel()
+        else:     self.model   = self.build()
         
     # Build the model
     def build(self) -> 'model':
@@ -124,18 +121,17 @@ def train(load: bool) -> [int]:
     params      = loadParams()
     worldSize   = config["square_number"]
     debug       = config["debug"]
-    terminal    = config["terminal_mode"]
+    binary      = config["binary"]
     agent       = Train(params, load)
 
     for e in range(params['episodes']):
         score = 0
-        env   = World(worldSize, debug, terminal)
+        env   = World(worldSize, debug, binary, True)
         state = np.reshape(env.stateSpace, (1, params['state_space']))
         start = time.time()
         
         for i in range(params['max_steps']):
             action    = agent.action(state)
-            prevState = state
             nextState, reward, alive = env.step(action)
             score    += reward
             nextState = np.reshape(nextState, (1, len(nextState)))
